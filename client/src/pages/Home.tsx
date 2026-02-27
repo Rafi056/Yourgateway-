@@ -152,11 +152,11 @@ export default function Home() {
         <div className="container mx-auto px-4 md:px-6">
           <h2 className="text-4xl font-bold mb-8 font-serif">ابدأ رحلتك الدراسية في ماليزيا اليوم</h2>
           <div className="flex flex-col items-center gap-6">
-            <div className="flex items-center gap-4 text-2xl font-bold">
+            <div className="flex items-center gap-4 text-2xl font-bold flex-row-reverse">
               <Phone className="h-8 w-8 text-secondary" />
               <div className="flex flex-col gap-1">
-                <span>+966 56 202 2668</span>
                 <span>+60 11-2908 2602</span>
+                <span>+966 56 202 2668</span>
               </div>
             </div>
             <div className="flex gap-6 mt-8">
