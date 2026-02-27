@@ -1,38 +1,55 @@
-import { type User, type InsertUser } from "@shared/schema";
-import { randomUUID } from "crypto";
-
-// modify the interface with any CRUD methods
-// you might need
+import { db } from "./db";
+import {
+  institutions,
+  applications,
+  type Institution,
+  type InsertInstitution,
+  type Application,
+  type InsertApplication,
+} from "@shared/schema";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  getInstitutions(type?: string): Promise<Institution[]>;
+  getInstitution(id: number): Promise<Institution | undefined>;
+  createInstitution(inst: InsertInstitution): Promise<Institution>;
+
+  createApplication(app: InsertApplication): Promise<Application>;
+  getApplications(): Promise<Application[]>;
+  getApplication(id: number): Promise<Application | undefined>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-
-  constructor() {
-    this.users = new Map();
+export class DatabaseStorage implements IStorage {
+  async getInstitutions(type?: string): Promise<Institution[]> {
+    if (type) {
+      return await db.select().from(institutions).where(eq(institutions.type, type));
+    }
+    return await db.select().from(institutions);
   }
 
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+  async getInstitution(id: number): Promise<Institution | undefined> {
+    const [institution] = await db.select().from(institutions).where(eq(institutions.id, id));
+    return institution;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+  async createInstitution(inst: InsertInstitution): Promise<Institution> {
+    const [institution] = await db.insert(institutions).values(inst).returning();
+    return institution;
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+  async createApplication(app: InsertApplication): Promise<Application> {
+    const [application] = await db.insert(applications).values(app).returning();
+    return application;
+  }
+
+  async getApplications(): Promise<Application[]> {
+    return await db.select().from(applications);
+  }
+
+  async getApplication(id: number): Promise<Application | undefined> {
+    const [application] = await db.select().from(applications).where(eq(applications.id, id));
+    return application;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
