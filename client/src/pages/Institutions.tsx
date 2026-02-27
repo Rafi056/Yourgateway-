@@ -32,8 +32,7 @@ export default function Institutions() {
       </div>
 
       <div className="container mx-auto px-4 md:px-6 mt-8">
-        {/* Filters */}
-        <div className="flex flex-wrap gap-4 mb-12 border-b border-border pb-4">
+        <div className="flex flex-wrap gap-4 mb-12 border-b border-border pb-4 flex-row-reverse">
           <button
             onClick={() => setFilterType("all")}
             className={`px-6 py-2 rounded-full font-medium transition-all ${
@@ -42,27 +41,27 @@ export default function Institutions() {
                 : "bg-background hover:bg-muted text-muted-foreground"
             }`}
           >
-            All Institutions
+            الكل
           </button>
           <button
             onClick={() => setFilterType("university")}
-            className={`px-6 py-2 rounded-full font-medium transition-all flex items-center gap-2 ${
+            className={`px-6 py-2 rounded-full font-medium transition-all flex items-center gap-2 flex-row-reverse ${
               filterType === "university" 
                 ? "bg-primary text-white shadow-md" 
                 : "bg-background hover:bg-muted text-muted-foreground"
             }`}
           >
-            <Building2 className="w-4 h-4" /> Universities
+            <Building2 className="w-4 h-4" /> الجامعات
           </button>
           <button
             onClick={() => setFilterType("language_center")}
-            className={`px-6 py-2 rounded-full font-medium transition-all flex items-center gap-2 ${
+            className={`px-6 py-2 rounded-full font-medium transition-all flex items-center gap-2 flex-row-reverse ${
               filterType === "language_center" 
                 ? "bg-primary text-white shadow-md" 
                 : "bg-background hover:bg-muted text-muted-foreground"
             }`}
           >
-            <BookOpen className="w-4 h-4" /> Language Centers
+            <BookOpen className="w-4 h-4" /> معاهد اللغة
           </button>
         </div>
 

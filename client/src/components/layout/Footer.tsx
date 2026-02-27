@@ -13,38 +13,38 @@ export function Footer() {
                 StudyMalaysia
               </span>
             </Link>
-            <p className="mt-6 text-white/70 max-w-sm text-balance leading-relaxed">
-              Your premier gateway to world-class education. Whether you're pursuing a degree or mastering English, start your journey here.
+            <p className="mt-6 text-white/70 max-w-sm text-balance leading-relaxed text-right">
+              بوابتك الموثوقة للتعليم العالمي في ماليزيا. سواء كنت تسعى للحصول على درجة جامعية أو إتقان اللغة الإنجليزية، ابدأ رحلتك معنا هنا.
             </p>
           </div>
           
-          <div>
-            <h4 className="font-serif text-lg font-semibold mb-6 text-white">Explore</h4>
+          <div className="text-right">
+            <h4 className="font-serif text-lg font-semibold mb-6 text-white">استكشف</h4>
             <ul className="space-y-4 text-white/70">
               <li>
-                <Link href="/institutions?type=university" className="hover:text-secondary transition-colors">Universities</Link>
+                <Link href="/institutions?type=university" className="hover:text-secondary transition-colors">الجامعات</Link>
               </li>
               <li>
-                <Link href="/institutions?type=language_center" className="hover:text-secondary transition-colors">Language Centers</Link>
+                <Link href="/institutions?type=language_center" className="hover:text-secondary transition-colors">معاهد اللغة</Link>
               </li>
               <li>
-                <Link href="/dashboard" className="hover:text-secondary transition-colors">My Dashboard</Link>
+                <Link href="/dashboard" className="hover:text-secondary transition-colors">لوحة التحكم</Link>
               </li>
             </ul>
           </div>
 
-          <div>
-            <h4 className="font-serif text-lg font-semibold mb-6 text-white">Support</h4>
+          <div className="text-right">
+            <h4 className="font-serif text-lg font-semibold mb-6 text-white">الدعم والتواصل</h4>
             <ul className="space-y-4 text-white/70">
-              <li><a href="#" className="hover:text-secondary transition-colors">Contact Us</a></li>
-              <li><a href="#" className="hover:text-secondary transition-colors">Visa Guide</a></li>
-              <li><a href="#" className="hover:text-secondary transition-colors">FAQ</a></li>
+              <li><a href="https://wa.me/966562022668" className="hover:text-secondary transition-colors">واتساب</a></li>
+              <li><a href="https://direct.me/gatemalay" className="hover:text-secondary transition-colors">منصاتنا الاجتماعية</a></li>
+              <li><a href="#" className="hover:text-secondary transition-colors">الأسئلة الشائعة</a></li>
             </ul>
           </div>
         </div>
         
         <div className="mt-16 pt-8 border-t border-white/10 text-center text-white/50 text-sm">
-          <p>© {new Date().getFullYear()} StudyMalaysia Portal. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} بوابتك إلى ماليزيا. جميع الحقوق محفوظة.</p>
         </div>
       </div>
     </footer>
