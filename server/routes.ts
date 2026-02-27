@@ -8,36 +8,34 @@ async function seedDatabase() {
   const existing = await storage.getInstitutions();
   if (existing.length === 0) {
     // Universities
-    await storage.createInstitution({
-      name: "Universiti Malaya (UM)",
-      type: "university",
-      description: "Malaysia's oldest university, situated in Kuala Lumpur.",
-      location: "Kuala Lumpur, Malaysia",
-      imageUrl: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=600",
-    });
-    await storage.createInstitution({
-      name: "Taylor's University",
-      type: "university",
-      description: "A premier private university located in Subang Jaya.",
-      location: "Subang Jaya, Malaysia",
-      imageUrl: "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=600",
-    });
+    const universities = [
+      "APU", "Taylor's", "UCSI", "UNITEN", "Lincoln", "City", "MMU", "MSU", "SEGI", "Cyberjaya", "Mahsa", "Geometika", "Others"
+    ];
+    for (const name of universities) {
+      await storage.createInstitution({
+        name,
+        type: "university",
+        description: name === "Others" ? "Select this option if your desired university is not listed." : `Study at ${name}, one of Malaysia's leading universities.`,
+        location: "Malaysia",
+        imageUrl: null,
+      });
+    }
 
     // Language Centers
-    await storage.createInstitution({
-      name: "ELS Language Centers",
-      type: "language_center",
-      description: "Top-tier English language learning center for international students.",
-      location: "Kuala Lumpur, Malaysia",
-      imageUrl: "https://images.unsplash.com/photo-1571260899304-42507011ec7a?auto=format&fit=crop&q=80&w=600",
-    });
-    await storage.createInstitution({
-      name: "British Council Malaysia",
-      type: "language_center",
-      description: "Worldwide organization for cultural relations and educational opportunities.",
-      location: "Kuala Lumpur, Malaysia",
-      imageUrl: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&q=80&w=600",
-    });
+    const languageCenters = [
+      "Britannia Language Centre", "Sheffield Academy", "EMS Language Centre", "Bright Language Center", 
+      "Big Ben Academy", "EXCEL Language Center", "Erican Language Center", "Webster Language Center", 
+      "Study circle language center", "Others"
+    ];
+    for (const name of languageCenters) {
+      await storage.createInstitution({
+        name,
+        type: "language_center",
+        description: name === "Others" ? "Select this option if your desired language center is not listed." : `Learn English at ${name}, a premier language institution.`,
+        location: "Malaysia",
+        imageUrl: null,
+      });
+    }
   }
 }
 
