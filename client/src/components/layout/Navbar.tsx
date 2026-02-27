@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { GraduationCap, BookOpen, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import logoImg from "@assets/IMG_3512_1772166816327.jpeg";
 
 export function Navbar() {
   const [location] = useLocation();
@@ -15,11 +16,13 @@ export function Navbar() {
     <nav className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-md">
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex h-20 items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="bg-primary text-primary-foreground p-2 rounded-xl group-hover:scale-105 transition-transform duration-300">
-              <GraduationCap className="h-6 w-6" />
-            </div>
-            <span className="font-serif text-2xl font-bold tracking-tight text-primary">
+          <Link href="/" className="flex items-center gap-3 group">
+            <img 
+              src={logoImg} 
+              alt="Gateway to Malaysia Logo" 
+              className="h-12 w-auto object-contain rounded-lg shadow-sm group-hover:scale-105 transition-transform duration-300"
+            />
+            <span className="font-serif text-2xl font-bold tracking-tight text-primary hidden sm:inline">
               StudyMalaysia
             </span>
           </Link>

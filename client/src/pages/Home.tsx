@@ -31,7 +31,7 @@ export default function Home() {
                 <span className="text-sm font-semibold tracking-wide uppercase">Your Global Future Awaits</span>
               </div>
               <h1 className="font-serif text-5xl md:text-7xl font-bold text-white mb-6 leading-tight text-balance">
-                Study in Malaysia, <br/>
+                Your Gateway to Malaysia, <br/>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-yellow-200">
                   Shape Your Destiny.
                 </span>
