@@ -1,40 +1,48 @@
 import { Link, useLocation } from "wouter";
-import { GraduationCap, BookOpen, LayoutDashboard } from "lucide-react";
+import { GraduationCap, BookOpen, LayoutDashboard, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/lib/i18n";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import logoImg from "@assets/IMG_3512_1772166816327.jpeg";
 
 export function Navbar() {
   const [location] = useLocation();
+  const { language, setLanguage, t, dir } = useLanguage();
 
   const navLinks = [
-    { href: "/institutions?type=university", label: "الجامعات", icon: GraduationCap },
-    { href: "/institutions?type=language_center", label: "معاهد اللغة", icon: BookOpen },
-    { href: "/dashboard", label: "طلباتي", icon: LayoutDashboard },
+    { href: "/institutions?type=university", label: t("nav.universities"), icon: GraduationCap },
+    { href: "/institutions?type=language_center", label: t("nav.language_centers"), icon: BookOpen },
+    { href: "/dashboard", label: t("nav.my_applications"), icon: LayoutDashboard },
   ];
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-md">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="flex h-20 items-center justify-between flex-row-reverse">
-          <Link href="/" className="flex items-center gap-3 group flex-row-reverse">
+        <div className={`flex h-20 items-center justify-between ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+          <Link href="/" className={`flex items-center gap-3 group ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
             <img 
               src={logoImg} 
-              alt="شعار بوابتك إلى ماليزيا" 
+              alt={t("nav.brand")} 
               className="h-12 w-auto object-contain rounded-lg shadow-sm group-hover:scale-105 transition-transform duration-300"
             />
             <span className="font-serif text-2xl font-bold tracking-tight text-primary hidden sm:inline">
-              بوابتك إلى ماليزيا
+              {t("nav.brand")}
             </span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-8 flex-row-reverse">
+          <div className={`hidden md:flex items-center gap-8 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
             {navLinks.map((link) => {
               const isActive = location === link.href || (location.startsWith("/institutions") && link.href.includes("institutions"));
               return (
                 <Link 
                   key={link.href} 
                   href={link.href}
-                  className={`flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary flex-row-reverse ${
+                  className={`flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary ${dir === "rtl" ? "flex-row-reverse" : ""} ${
                     isActive ? "text-primary border-b-2 border-primary py-7" : "text-muted-foreground"
                   }`}
                 >
@@ -46,9 +54,21 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center gap-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="rounded-full">
+                  <Languages className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align={dir === "rtl" ? "start" : "end"}>
+                <DropdownMenuItem onClick={() => setLanguage("ar")}>العربية</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("en")}>English</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
             <Link href="/institutions">
               <Button className="rounded-full px-6 font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">
-                قدم الآن
+                {t("nav.apply_now")}
               </Button>
             </Link>
           </div>

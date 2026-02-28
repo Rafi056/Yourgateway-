@@ -9,11 +9,8 @@ import NotFound from "@/pages/not-found";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 
-// Pages
-import Home from "./pages/Home";
-import Institutions from "./pages/Institutions";
-import InstitutionDetails from "./pages/InstitutionDetails";
-import Dashboard from "./pages/Dashboard";
+// lib
+import { LanguageProvider } from "./lib/i18n";
 
 function Router() {
   return (
@@ -31,14 +28,16 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <div className="flex flex-col min-h-screen">
-          <Navbar />
-          <main className="flex-grow">
-            <Router />
-          </main>
-          <Footer />
-        </div>
-        <Toaster />
+        <LanguageProvider>
+          <div className="flex flex-col min-h-screen">
+            <Navbar />
+            <main className="flex-grow">
+              <Router />
+            </main>
+            <Footer />
+          </div>
+          <Toaster />
+        </LanguageProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

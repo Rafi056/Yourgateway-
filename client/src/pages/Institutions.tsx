@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useInstitutions } from "@/hooks/use-institutions";
-import { Building2, MapPin, ArrowRight, BookOpen, Loader2 } from "lucide-react";
+import { Building2, MapPin, ArrowRight, ArrowLeft, BookOpen, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useLanguage } from "@/lib/i18n";
 
 export default function Institutions() {
   const [location] = useLocation();
+  const { t, dir } = useLanguage();
   // Extract simple query param manually for simplicity
   const searchParams = new URLSearchParams(window.location.search);
   const initialType = searchParams.get("type") || "all";
@@ -18,21 +20,22 @@ export default function Institutions() {
   );
 
   return (
-    <div className="min-h-screen bg-muted/30 pb-20">
+    <div className={`min-h-screen bg-muted/30 pb-20 ${dir === "rtl" ? "text-right" : "text-left"}`}>
       {/* Header */}
       <div className="bg-primary text-primary-foreground py-16">
         <div className="container mx-auto px-4 md:px-6">
           <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4">
-            Discover Institutions
+            {t("inst.title")}
           </h1>
           <p className="text-white/80 max-w-2xl text-lg">
-            Browse our curated selection of top-tier educational institutions across Malaysia.
+            {t("inst.desc")}
           </p>
         </div>
       </div>
 
       <div className="container mx-auto px-4 md:px-6 mt-8">
-        <div className="flex flex-wrap gap-4 mb-12 border-b border-border pb-4 flex-row-reverse">
+        {/* Filters */}
+        <div className={`flex flex-wrap gap-4 mb-12 border-b border-border pb-4 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
           <button
             onClick={() => setFilterType("all")}
             className={`px-6 py-2 rounded-full font-medium transition-all ${
@@ -41,27 +44,27 @@ export default function Institutions() {
                 : "bg-background hover:bg-muted text-muted-foreground"
             }`}
           >
-            الكل
+            {t("inst.all")}
           </button>
           <button
             onClick={() => setFilterType("university")}
-            className={`px-6 py-2 rounded-full font-medium transition-all flex items-center gap-2 flex-row-reverse ${
+            className={`px-6 py-2 rounded-full font-medium transition-all flex items-center gap-2 ${dir === "rtl" ? "flex-row-reverse" : ""} ${
               filterType === "university" 
                 ? "bg-primary text-white shadow-md" 
                 : "bg-background hover:bg-muted text-muted-foreground"
             }`}
           >
-            <Building2 className="w-4 h-4" /> الجامعات
+            <Building2 className="w-4 h-4" /> {t("inst.universities")}
           </button>
           <button
             onClick={() => setFilterType("language_center")}
-            className={`px-6 py-2 rounded-full font-medium transition-all flex items-center gap-2 flex-row-reverse ${
+            className={`px-6 py-2 rounded-full font-medium transition-all flex items-center gap-2 ${dir === "rtl" ? "flex-row-reverse" : ""} ${
               filterType === "language_center" 
                 ? "bg-primary text-white shadow-md" 
                 : "bg-background hover:bg-muted text-muted-foreground"
             }`}
           >
-            <BookOpen className="w-4 h-4" /> معاهد اللغة
+            <BookOpen className="w-4 h-4" /> {t("inst.language_centers")}
           </button>
         </div>
 
@@ -69,14 +72,14 @@ export default function Institutions() {
         {isLoading && (
           <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
             <Loader2 className="w-12 h-12 animate-spin mb-4 text-primary" />
-            <p>Loading institutions...</p>
+            <p>{t("inst.loading")}</p>
           </div>
         )}
 
         {error && (
           <div className="bg-destructive/10 border border-destructive text-destructive p-6 rounded-xl text-center">
-            <p className="font-bold">Failed to load institutions.</p>
-            <p className="text-sm opacity-80">Please try again later.</p>
+            <p className="font-bold">{t("inst.failed")}</p>
+            <p className="text-sm opacity-80">{t("inst.try_again")}</p>
           </div>
         )}
 
@@ -102,19 +105,19 @@ export default function Institutions() {
                       {inst.type === 'university' ? <Building2 className="w-12 h-12 opacity-50" /> : <BookOpen className="w-12 h-12 opacity-50" />}
                     </div>
                   )}
-                  <div className="absolute top-4 left-4">
+                  <div className={`absolute top-4 ${dir === "rtl" ? "right-4" : "left-4"}`}>
                     <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md ${
                       inst.type === 'university' ? 'bg-primary/90 text-white' : 'bg-secondary/90 text-secondary-foreground'
                     }`}>
-                      {inst.type.replace('_', ' ')}
+                      {inst.type === 'university' ? t("details.university") : t("details.language_center")}
                     </span>
                   </div>
                 </div>
                 
                 <div className="p-6 flex flex-col flex-grow">
                   <h3 className="font-serif text-2xl font-bold mb-2 line-clamp-2">{inst.name}</h3>
-                  <div className="flex items-center text-muted-foreground text-sm mb-4">
-                    <MapPin className="w-4 h-4 mr-1" />
+                  <div className={`flex items-center text-muted-foreground text-sm mb-4 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                    <MapPin className={`w-4 h-4 ${dir === "rtl" ? "ml-1" : "mr-1"}`} />
                     {inst.location}
                   </div>
                   <p className="text-muted-foreground text-sm line-clamp-3 mb-6 flex-grow">
@@ -123,8 +126,8 @@ export default function Institutions() {
                   
                   <Link href={`/institutions/${inst.id}`}>
                     <Button className="w-full group/btn" variant="outline">
-                      View Details
-                      <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                      {t("inst.view_details")}
+                      {dir === "rtl" ? <ArrowLeft className="w-4 h-4 mr-2 group-hover/btn:-translate-x-1 transition-transform" /> : <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />}
                     </Button>
                   </Link>
                 </div>
@@ -137,8 +140,8 @@ export default function Institutions() {
               <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
                 <Building2 className="w-8 h-8 text-muted-foreground" />
               </div>
-              <h3 className="text-xl font-bold mb-2">No institutions found</h3>
-              <p className="text-muted-foreground">Try adjusting your filters.</p>
+              <h3 className="text-xl font-bold mb-2">{t("inst.not_found")}</h3>
+              <p className="text-muted-foreground">{t("inst.adjust_filters")}</p>
             </div>
           )}
         </div>
