@@ -5,6 +5,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 
+// Pages
+import Home from "./pages/Home";
+import Institutions from "./pages/Institutions";
+import InstitutionDetails from "./pages/InstitutionDetails";
+import Dashboard from "./pages/Dashboard";
+
 // Components
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
