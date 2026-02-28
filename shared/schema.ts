@@ -11,6 +11,20 @@ export const institutions = pgTable("institutions", {
   imageUrl: text("image_url"),
 });
 
+export const packages = pgTable("packages", {
+  id: serial("id").primaryKey(),
+  nameAr: text("name_ar").notNull(),
+  nameEn: text("name_en").notNull(),
+  originalPrice: text("original_price").notNull(),
+  discountedPrice: text("discounted_price").notNull(),
+  savings: text("savings"),
+  descriptionAr: text("description_ar").notNull(),
+  descriptionEn: text("description_en").notNull(),
+  featuresAr: text("features_ar").array().notNull(),
+  featuresEn: text("features_en").array().notNull(),
+  isSpecial: text("is_special").default("false"), // Use text for boolean simplicity in some environments or just boolean
+});
+
 export const applications = pgTable("applications", {
   id: serial("id").primaryKey(),
   studentName: text("student_name").notNull(),

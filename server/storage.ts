@@ -2,6 +2,7 @@ import { db } from "./db";
 import {
   institutions,
   applications,
+  packages,
   type Institution,
   type InsertInstitution,
   type Application,
@@ -17,6 +18,8 @@ export interface IStorage {
   createApplication(app: InsertApplication): Promise<Application>;
   getApplications(): Promise<Application[]>;
   getApplication(id: number): Promise<Application | undefined>;
+
+  getPackages(): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -49,6 +52,10 @@ export class DatabaseStorage implements IStorage {
   async getApplication(id: number): Promise<Application | undefined> {
     const [application] = await db.select().from(applications).where(eq(applications.id, id));
     return application;
+  }
+
+  async getPackages(): Promise<any[]> {
+    return await db.select().from(packages);
   }
 }
 
