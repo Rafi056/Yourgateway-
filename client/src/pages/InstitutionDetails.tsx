@@ -29,6 +29,16 @@ export default function InstitutionDetails() {
     e.preventDefault();
     if (!institution) return;
 
+    const message = `طلب جديد من ${formData.studentName}\nالمؤسسة: ${institution.name}\nالبرنامج: ${formData.desiredProgram}\nالبريد: ${formData.studentEmail}`;
+    const encodedMessage = encodeURIComponent(message);
+    
+    // Open WhatsApp for both numbers
+    window.open(`https://wa.me/601129082602?text=${encodedMessage}`, '_blank');
+    
+    setTimeout(() => {
+      window.open(`https://wa.me/966562022668?text=${encodedMessage}`, '_blank');
+    }, 800);
+
     submitApplication({
       ...formData,
       institutionId: institution.id,
