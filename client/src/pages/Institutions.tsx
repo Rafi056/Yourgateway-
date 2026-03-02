@@ -130,14 +130,14 @@ export default function Institutions() {
                   
                   <div className="mb-8">
                     <div className="flex items-baseline gap-2 mb-1">
-                      <span className="text-sm text-muted-foreground line-through">MYR {pkg.originalPrice}</span>
+                      <span className="text-sm text-muted-foreground line-through">{language === 'ar' ? `${pkg.originalPrice} ر.س` : `SAR ${pkg.originalPrice}`}</span>
                     </div>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-4xl font-black text-primary">MYR {pkg.discountedPrice}</span>
+                      <span className="text-4xl font-black text-primary">{language === 'ar' ? `${pkg.discountedPrice} ر.س` : `SAR ${pkg.discountedPrice}`}</span>
                     </div>
                     {pkg.savings && (
                       <div className="mt-2 inline-flex items-center px-2 py-1 rounded-md bg-green-100 text-green-700 text-xs font-bold">
-                        {language === 'ar' ? `وفر ${pkg.savings} رينغيت` : `Save MYR ${pkg.savings}`}
+                        {language === 'ar' ? `وفر ${pkg.savings} ر.س` : `Save SAR ${pkg.savings}`}
                       </div>
                     )}
                   </div>
@@ -257,8 +257,8 @@ export default function Institutions() {
                   {language === 'ar' ? selectedPkg.nameAr : selectedPkg.nameEn}
                 </h3>
                 <div className="flex items-baseline gap-2 mt-2">
-                  <span className="text-3xl font-black text-primary">MYR {selectedPkg.discountedPrice}</span>
-                  <span className="text-sm text-muted-foreground line-through">MYR {selectedPkg.originalPrice}</span>
+                  <span className="text-3xl font-black text-primary">{language === 'ar' ? `${selectedPkg.discountedPrice} ر.س` : `SAR ${selectedPkg.discountedPrice}`}</span>
+                  <span className="text-sm text-muted-foreground line-through">{language === 'ar' ? `${selectedPkg.originalPrice} ر.س` : `SAR ${selectedPkg.originalPrice}`}</span>
                 </div>
               </div>
 
@@ -270,8 +270,8 @@ export default function Institutions() {
                 <a
                   href={`https://wa.me/966562022668?text=${encodeURIComponent(
                     language === 'ar' 
-                      ? `أريد الاشتراك في ${selectedPkg.nameAr}\nالسعر: MYR ${selectedPkg.discountedPrice}\nأريد الدفع عبر تابي (Tabby) - أقساط`
-                      : `I want to subscribe to ${selectedPkg.nameEn}\nPrice: MYR ${selectedPkg.discountedPrice}\nPayment via Tabby - Installments`
+                      ? `أريد الاشتراك في ${selectedPkg.nameAr}\nالسعر: ${selectedPkg.discountedPrice} ر.س\nأريد الدفع عبر تابي (Tabby) - أقساط`
+                      : `I want to subscribe to ${selectedPkg.nameEn}\nPrice: SAR ${selectedPkg.discountedPrice}\nPayment via Tabby - Installments`
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -295,8 +295,8 @@ export default function Institutions() {
                 <a
                   href={`https://wa.me/966562022668?text=${encodeURIComponent(
                     language === 'ar'
-                      ? `أريد الاشتراك في ${selectedPkg.nameAr}\nالسعر: MYR ${selectedPkg.discountedPrice}\nأريد الدفع عبر تمارا (Tamara) - أقساط`
-                      : `I want to subscribe to ${selectedPkg.nameEn}\nPrice: MYR ${selectedPkg.discountedPrice}\nPayment via Tamara - Installments`
+                      ? `أريد الاشتراك في ${selectedPkg.nameAr}\nالسعر: ${selectedPkg.discountedPrice} ر.س\nأريد الدفع عبر تمارا (Tamara) - أقساط`
+                      : `I want to subscribe to ${selectedPkg.nameEn}\nPrice: SAR ${selectedPkg.discountedPrice}\nPayment via Tamara - Installments`
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -320,8 +320,8 @@ export default function Institutions() {
                 <a
                   href={`https://wa.me/966562022668?text=${encodeURIComponent(
                     language === 'ar'
-                      ? `أريد الاشتراك في ${selectedPkg.nameAr}\nالسعر: MYR ${selectedPkg.discountedPrice}\nأريد الدفع عبر تحويل بنكي`
-                      : `I want to subscribe to ${selectedPkg.nameEn}\nPrice: MYR ${selectedPkg.discountedPrice}\nPayment via Bank Transfer`
+                      ? `أريد الاشتراك في ${selectedPkg.nameAr}\nالسعر: ${selectedPkg.discountedPrice} ر.س\nأريد الدفع عبر تحويل بنكي`
+                      : `I want to subscribe to ${selectedPkg.nameEn}\nPrice: SAR ${selectedPkg.discountedPrice}\nPayment via Bank Transfer`
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -345,8 +345,8 @@ export default function Institutions() {
                 <a
                   href={`https://wa.me/966562022668?text=${encodeURIComponent(
                     language === 'ar'
-                      ? `أريد الاستفسار عن ${selectedPkg.nameAr}\nالسعر: MYR ${selectedPkg.discountedPrice}`
-                      : `I want to inquire about ${selectedPkg.nameEn}\nPrice: MYR ${selectedPkg.discountedPrice}`
+                      ? `أريد الاستفسار عن ${selectedPkg.nameAr}\nالسعر: ${selectedPkg.discountedPrice} ر.س`
+                      : `I want to inquire about ${selectedPkg.nameEn}\nPrice: SAR ${selectedPkg.discountedPrice}`
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
