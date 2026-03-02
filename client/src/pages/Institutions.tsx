@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useInstitutions } from "@/hooks/use-institutions";
-import { Building2, MapPin, ArrowRight, ArrowLeft, BookOpen, Loader2, CheckCircle2, Zap, Sparkles, CreditCard, Banknote, MessageCircle, X } from "lucide-react";
+import { Building2, MapPin, ArrowRight, ArrowLeft, BookOpen, Loader2, CheckCircle2, Zap, Sparkles, CreditCard, Banknote, MessageCircle, X, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/lib/i18n";
@@ -15,6 +15,14 @@ export default function Institutions() {
   
   const [filterType, setFilterType] = useState<string>(initialType);
   const [selectedPkg, setSelectedPkg] = useState<any>(null);
+  const [showMYR, setShowMYR] = useState(false);
+
+  const SAR_TO_MYR = 1.25;
+  const toMYR = (sarPrice: string) => {
+    const num = parseFloat(sarPrice.replace(/,/g, ''));
+    const myr = Math.round(num * SAR_TO_MYR);
+    return myr.toLocaleString();
+  };
   
   const { data: institutions, isLoading, error } = useInstitutions(
     filterType === "all" ? undefined : (filterType === "packages" ? "language_center" : filterType)
@@ -105,6 +113,29 @@ export default function Institutions() {
         )}
 
         {filterType === "packages" ? (
+          <>
+          <div className={`flex items-center justify-between mb-6 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+            <button
+              onClick={() => setShowMYR(!showMYR)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all border ${dir === "rtl" ? "flex-row-reverse" : ""} ${
+                showMYR 
+                  ? "bg-primary/10 border-primary/30 text-primary" 
+                  : "bg-muted border-border text-muted-foreground hover:bg-muted/80"
+              }`}
+              data-testid="btn-toggle-currency"
+            >
+              <RefreshCw className={`w-4 h-4 transition-transform ${showMYR ? "rotate-180" : ""}`} />
+              {showMYR
+                ? (language === 'ar' ? "إخفاء الرينغيت الماليزي" : "Hide MYR")
+                : (language === 'ar' ? "عرض بالرينغيت الماليزي" : "Show in MYR")
+              }
+            </button>
+            {showMYR && (
+              <span className="text-xs text-muted-foreground">
+                {language === 'ar' ? "* السعر التقريبي - سعر الصرف قد يتغير" : "* Approximate - exchange rate may vary"}
+              </span>
+            )}
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {packagesData?.map((pkg: any, idx: number) => (
               <motion.div
@@ -131,13 +162,18 @@ export default function Institutions() {
                   <div className="mb-8">
                     <div className="flex items-baseline gap-2 mb-1">
                       <span className="text-sm text-muted-foreground line-through">{language === 'ar' ? `${pkg.originalPrice} ر.س` : `SAR ${pkg.originalPrice}`}</span>
+                      {showMYR && <span className="text-xs text-muted-foreground line-through">(MYR {toMYR(pkg.originalPrice)})</span>}
                     </div>
-                    <div className="flex items-baseline gap-1">
+                    <div className="flex items-baseline gap-2 flex-wrap">
                       <span className="text-4xl font-black text-primary">{language === 'ar' ? `${pkg.discountedPrice} ر.س` : `SAR ${pkg.discountedPrice}`}</span>
+                      {showMYR && <span className="text-lg font-bold text-muted-foreground">(MYR {toMYR(pkg.discountedPrice)})</span>}
                     </div>
                     {pkg.savings && (
-                      <div className="mt-2 inline-flex items-center px-2 py-1 rounded-md bg-green-100 text-green-700 text-xs font-bold">
-                        {language === 'ar' ? `وفر ${pkg.savings} ر.س` : `Save SAR ${pkg.savings}`}
+                      <div className="mt-2 inline-flex items-center gap-2 flex-wrap">
+                        <span className="inline-flex items-center px-2 py-1 rounded-md bg-green-100 text-green-700 text-xs font-bold">
+                          {language === 'ar' ? `وفر ${pkg.savings} ر.س` : `Save SAR ${pkg.savings}`}
+                        </span>
+                        {showMYR && <span className="text-xs text-green-600 font-medium">(MYR {toMYR(pkg.savings)})</span>}
                       </div>
                     )}
                   </div>
@@ -163,6 +199,7 @@ export default function Institutions() {
               </motion.div>
             ))}
           </div>
+          </>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
             {institutions?.map((inst, idx) => (
@@ -256,10 +293,15 @@ export default function Institutions() {
                 <h3 className="font-serif text-2xl font-bold mb-1">
                   {language === 'ar' ? selectedPkg.nameAr : selectedPkg.nameEn}
                 </h3>
-                <div className="flex items-baseline gap-2 mt-2">
+                <div className="flex items-baseline gap-2 mt-2 flex-wrap">
                   <span className="text-3xl font-black text-primary">{language === 'ar' ? `${selectedPkg.discountedPrice} ر.س` : `SAR ${selectedPkg.discountedPrice}`}</span>
                   <span className="text-sm text-muted-foreground line-through">{language === 'ar' ? `${selectedPkg.originalPrice} ر.س` : `SAR ${selectedPkg.originalPrice}`}</span>
                 </div>
+                {showMYR && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    ≈ MYR {toMYR(selectedPkg.discountedPrice)} <span className="opacity-60">({language === 'ar' ? "تقريبي" : "approx."})</span>
+                  </p>
+                )}
               </div>
 
               <p className="text-sm text-muted-foreground mb-6">
