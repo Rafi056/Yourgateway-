@@ -1,20 +1,20 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useInstitutions } from "@/hooks/use-institutions";
-import { Building2, MapPin, ArrowRight, ArrowLeft, BookOpen, Loader2, CheckCircle2, Zap, Sparkles } from "lucide-react";
+import { Building2, MapPin, ArrowRight, ArrowLeft, BookOpen, Loader2, CheckCircle2, Zap, Sparkles, CreditCard, Banknote, MessageCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 
 export default function Institutions() {
   const [location] = useLocation();
   const { t, dir, language } = useLanguage();
-  // Extract simple query param manually for simplicity
   const searchParams = new URLSearchParams(window.location.search);
   const initialType = searchParams.get("type") || "all";
   
   const [filterType, setFilterType] = useState<string>(initialType);
+  const [selectedPkg, setSelectedPkg] = useState<any>(null);
   
   const { data: institutions, isLoading, error } = useInstitutions(
     filterType === "all" ? undefined : (filterType === "packages" ? "language_center" : filterType)
@@ -31,7 +31,6 @@ export default function Institutions() {
 
   return (
     <div className={`min-h-screen bg-muted/30 pb-20 ${dir === "rtl" ? "text-right" : "text-left"}`}>
-      {/* Header */}
       <div className="bg-primary text-primary-foreground py-16">
         <div className="container mx-auto px-4 md:px-6">
           <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4">
@@ -44,7 +43,6 @@ export default function Institutions() {
       </div>
 
       <div className="container mx-auto px-4 md:px-6 mt-8">
-        {/* Filters */}
         <div className={`flex flex-wrap gap-4 mb-12 border-b border-border pb-4 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
           <button
             onClick={() => setFilterType("all")}
@@ -53,6 +51,7 @@ export default function Institutions() {
                 ? "bg-primary text-white shadow-md" 
                 : "bg-background hover:bg-muted text-muted-foreground"
             }`}
+            data-testid="filter-all"
           >
             {t("inst.all")}
           </button>
@@ -63,6 +62,7 @@ export default function Institutions() {
                 ? "bg-primary text-white shadow-md" 
                 : "bg-background hover:bg-muted text-muted-foreground"
             }`}
+            data-testid="filter-university"
           >
             <Building2 className="w-4 h-4" /> {t("inst.universities")}
           </button>
@@ -73,6 +73,7 @@ export default function Institutions() {
                 ? "bg-primary text-white shadow-md" 
                 : "bg-background hover:bg-muted text-muted-foreground"
             }`}
+            data-testid="filter-language"
           >
             <BookOpen className="w-4 h-4" /> {t("inst.language_centers")}
           </button>
@@ -83,10 +84,25 @@ export default function Institutions() {
                 ? "bg-secondary text-secondary-foreground shadow-md" 
                 : "bg-background hover:bg-muted text-muted-foreground border-secondary/30 border"
             }`}
+            data-testid="filter-packages"
           >
             <Zap className="w-4 h-4" /> {language === 'ar' ? "باقات اللغة" : "Language Packages"}
           </button>
         </div>
+
+        {isLoading && (
+          <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+            <Loader2 className="w-12 h-12 animate-spin mb-4 text-primary" />
+            <p>{t("inst.loading")}</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-destructive/10 border border-destructive text-destructive p-6 rounded-xl text-center">
+            <p className="font-bold">{t("inst.failed")}</p>
+            <p className="text-sm opacity-80">{t("inst.try_again")}</p>
+          </div>
+        )}
 
         {filterType === "packages" ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -136,17 +152,18 @@ export default function Institutions() {
                     ))}
                   </div>
 
-                  <Link href="/institutions?type=language_center">
-                    <Button className={`w-full py-6 rounded-xl font-bold text-lg ${pkg.isSpecial === "true" ? "bg-secondary text-secondary-foreground hover:bg-secondary/90" : ""}`}>
-                      {language === 'ar' ? "اختر معهداً للتقديم" : "Select Institute to Apply"}
-                    </Button>
-                  </Link>
+                  <Button 
+                    onClick={() => setSelectedPkg(pkg)}
+                    className={`w-full py-6 rounded-xl font-bold text-lg ${pkg.isSpecial === "true" ? "bg-secondary text-secondary-foreground hover:bg-secondary/90" : ""}`}
+                    data-testid={`btn-subscribe-${pkg.id}`}
+                  >
+                    {language === 'ar' ? "اشترك الآن" : "Subscribe Now"}
+                  </Button>
                 </div>
               </motion.div>
             ))}
           </div>
         ) : (
-          /* Grid */
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
             {institutions?.map((inst, idx) => (
               <motion.div
@@ -188,7 +205,7 @@ export default function Institutions() {
                     </p>
                     
                     <Link href={`/institutions/${inst.id}`}>
-                      <Button className="w-full group/btn" variant="outline">
+                      <Button className="w-full group/btn" variant="outline" data-testid={`btn-view-${inst.id}`}>
                         {t("inst.view_details")}
                         {dir === "rtl" ? <ArrowLeft className="w-4 h-4 mr-2 group-hover/btn:-translate-x-1 transition-transform" /> : <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />}
                       </Button>
@@ -210,6 +227,154 @@ export default function Institutions() {
           </div>
         )}
       </div>
+
+      <AnimatePresence>
+        {selectedPkg && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={() => setSelectedPkg(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className={`bg-card rounded-3xl p-8 max-w-md w-full shadow-2xl border border-border relative ${dir === "rtl" ? "text-right" : "text-left"}`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button 
+                onClick={() => setSelectedPkg(null)} 
+                className={`absolute top-4 ${dir === "rtl" ? "left-4" : "right-4"} p-2 rounded-full hover:bg-muted transition-colors`}
+                data-testid="btn-close-modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              
+              <div className="mb-6">
+                <h3 className="font-serif text-2xl font-bold mb-1">
+                  {language === 'ar' ? selectedPkg.nameAr : selectedPkg.nameEn}
+                </h3>
+                <div className="flex items-baseline gap-2 mt-2">
+                  <span className="text-3xl font-black text-primary">MYR {selectedPkg.discountedPrice}</span>
+                  <span className="text-sm text-muted-foreground line-through">MYR {selectedPkg.originalPrice}</span>
+                </div>
+              </div>
+
+              <p className="text-sm text-muted-foreground mb-6">
+                {language === 'ar' ? "اختر طريقة الدفع المناسبة لك:" : "Choose your preferred payment method:"}
+              </p>
+
+              <div className="space-y-3">
+                <a
+                  href={`https://wa.me/966562022668?text=${encodeURIComponent(
+                    language === 'ar' 
+                      ? `أريد الاشتراك في ${selectedPkg.nameAr}\nالسعر: MYR ${selectedPkg.discountedPrice}\nأريد الدفع عبر تابي (Tabby) - أقساط`
+                      : `I want to subscribe to ${selectedPkg.nameEn}\nPrice: MYR ${selectedPkg.discountedPrice}\nPayment via Tabby - Installments`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                  data-testid="btn-pay-tabby"
+                >
+                  <Button variant="outline" className={`w-full py-5 text-base font-bold justify-between border-2 hover:border-[#3FCEA0] hover:bg-[#3FCEA0]/5 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                    <div className={`flex items-center gap-3 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                      <div className="w-10 h-10 rounded-xl bg-[#3FCEA0]/10 flex items-center justify-center">
+                        <CreditCard className="w-5 h-5 text-[#3FCEA0]" />
+                      </div>
+                      <div className={dir === "rtl" ? "text-right" : "text-left"}>
+                        <span className="block font-bold">Tabby</span>
+                        <span className="text-xs text-muted-foreground">{language === 'ar' ? "قسّمها على 4 دفعات" : "Split into 4 payments"}</span>
+                      </div>
+                    </div>
+                    <ArrowLeft className={`w-4 h-4 ${dir === "rtl" ? "" : "rotate-180"}`} />
+                  </Button>
+                </a>
+
+                <a
+                  href={`https://wa.me/966562022668?text=${encodeURIComponent(
+                    language === 'ar'
+                      ? `أريد الاشتراك في ${selectedPkg.nameAr}\nالسعر: MYR ${selectedPkg.discountedPrice}\nأريد الدفع عبر تمارا (Tamara) - أقساط`
+                      : `I want to subscribe to ${selectedPkg.nameEn}\nPrice: MYR ${selectedPkg.discountedPrice}\nPayment via Tamara - Installments`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                  data-testid="btn-pay-tamara"
+                >
+                  <Button variant="outline" className={`w-full py-5 text-base font-bold justify-between border-2 hover:border-[#F5A623] hover:bg-[#F5A623]/5 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                    <div className={`flex items-center gap-3 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                      <div className="w-10 h-10 rounded-xl bg-[#F5A623]/10 flex items-center justify-center">
+                        <CreditCard className="w-5 h-5 text-[#F5A623]" />
+                      </div>
+                      <div className={dir === "rtl" ? "text-right" : "text-left"}>
+                        <span className="block font-bold">Tamara</span>
+                        <span className="text-xs text-muted-foreground">{language === 'ar' ? "قسّمها على 3 دفعات" : "Split into 3 payments"}</span>
+                      </div>
+                    </div>
+                    <ArrowLeft className={`w-4 h-4 ${dir === "rtl" ? "" : "rotate-180"}`} />
+                  </Button>
+                </a>
+
+                <a
+                  href={`https://wa.me/966562022668?text=${encodeURIComponent(
+                    language === 'ar'
+                      ? `أريد الاشتراك في ${selectedPkg.nameAr}\nالسعر: MYR ${selectedPkg.discountedPrice}\nأريد الدفع عبر تحويل بنكي`
+                      : `I want to subscribe to ${selectedPkg.nameEn}\nPrice: MYR ${selectedPkg.discountedPrice}\nPayment via Bank Transfer`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                  data-testid="btn-pay-bank"
+                >
+                  <Button variant="outline" className={`w-full py-5 text-base font-bold justify-between border-2 hover:border-primary hover:bg-primary/5 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                    <div className={`flex items-center gap-3 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                        <Banknote className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className={dir === "rtl" ? "text-right" : "text-left"}>
+                        <span className="block font-bold">{language === 'ar' ? "تحويل بنكي" : "Bank Transfer"}</span>
+                        <span className="text-xs text-muted-foreground">{language === 'ar' ? "دفعة واحدة كاملة" : "Full payment"}</span>
+                      </div>
+                    </div>
+                    <ArrowLeft className={`w-4 h-4 ${dir === "rtl" ? "" : "rotate-180"}`} />
+                  </Button>
+                </a>
+
+                <a
+                  href={`https://wa.me/966562022668?text=${encodeURIComponent(
+                    language === 'ar'
+                      ? `أريد الاستفسار عن ${selectedPkg.nameAr}\nالسعر: MYR ${selectedPkg.discountedPrice}`
+                      : `I want to inquire about ${selectedPkg.nameEn}\nPrice: MYR ${selectedPkg.discountedPrice}`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                  data-testid="btn-pay-whatsapp"
+                >
+                  <Button className={`w-full py-5 text-base font-bold justify-between bg-[#25D366] hover:bg-[#128C7E] ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                    <div className={`flex items-center gap-3 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                      <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                        <MessageCircle className="w-5 h-5 text-white" />
+                      </div>
+                      <div className={dir === "rtl" ? "text-right" : "text-left"}>
+                        <span className="block font-bold text-white">{language === 'ar' ? "تواصل عبر واتساب" : "Chat on WhatsApp"}</span>
+                        <span className="text-xs text-white/80">{language === 'ar' ? "استفسر أو ادفع مباشرة" : "Inquire or pay directly"}</span>
+                      </div>
+                    </div>
+                    <ArrowLeft className={`w-4 h-4 text-white ${dir === "rtl" ? "" : "rotate-180"}`} />
+                  </Button>
+                </a>
+              </div>
+
+              <p className="text-xs text-center text-muted-foreground mt-6">
+                {language === 'ar' ? "سيتم توجيهك للواتساب لإتمام عملية الدفع مع فريقنا" : "You will be redirected to WhatsApp to complete payment with our team"}
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
