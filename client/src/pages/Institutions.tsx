@@ -15,13 +15,13 @@ export default function Institutions() {
   
   const [filterType, setFilterType] = useState<string>(initialType);
   const [selectedPkg, setSelectedPkg] = useState<any>(null);
-  const [showMYR, setShowMYR] = useState(false);
+  const [showSAR, setShowSAR] = useState(false);
 
-  const SAR_TO_MYR = 1.25;
-  const toMYR = (sarPrice: string) => {
-    const num = parseFloat(sarPrice.replace(/,/g, ''));
-    const myr = Math.round(num * SAR_TO_MYR);
-    return myr.toLocaleString();
+  const MYR_TO_SAR = 0.80;
+  const toSAR = (myrPrice: string) => {
+    const num = parseFloat(myrPrice.replace(/,/g, ''));
+    const sar = Math.round(num * MYR_TO_SAR);
+    return sar.toLocaleString();
   };
   
   const { data: institutions, isLoading, error } = useInstitutions(
@@ -116,23 +116,23 @@ export default function Institutions() {
           <>
           <div className={`flex items-center justify-between mb-6 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
             <button
-              onClick={() => setShowMYR(!showMYR)}
+              onClick={() => setShowSAR(!showSAR)}
               className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all border ${dir === "rtl" ? "flex-row-reverse" : ""} ${
-                showMYR 
+                showSAR 
                   ? "bg-primary/10 border-primary/30 text-primary" 
                   : "bg-muted border-border text-muted-foreground hover:bg-muted/80"
               }`}
               data-testid="btn-toggle-currency"
             >
-              <RefreshCw className={`w-4 h-4 transition-transform ${showMYR ? "rotate-180" : ""}`} />
-              {showMYR
-                ? (language === 'ar' ? "إخفاء الرينغيت الماليزي" : "Hide MYR")
-                : (language === 'ar' ? "عرض بالرينغيت الماليزي" : "Show in MYR")
+              <RefreshCw className={`w-4 h-4 transition-transform ${showSAR ? "rotate-180" : ""}`} />
+              {showSAR
+                ? (language === 'ar' ? "إخفاء الريال السعودي" : "Hide SAR")
+                : (language === 'ar' ? "عرض بالريال السعودي" : "Show in SAR")
               }
             </button>
-            {showMYR && (
+            {showSAR && (
               <span className="text-xs text-muted-foreground">
-                {language === 'ar' ? "* السعر التقريبي - سعر الصرف قد يتغير" : "* Approximate - exchange rate may vary"}
+                {language === 'ar' ? "* السعر تقريبي - سعر الصرف قد يتغير" : "* Approximate - exchange rate may vary"}
               </span>
             )}
           </div>
@@ -161,19 +161,19 @@ export default function Institutions() {
                   
                   <div className="mb-8">
                     <div className="flex items-baseline gap-2 mb-1">
-                      <span className="text-sm text-muted-foreground line-through">{language === 'ar' ? `${pkg.originalPrice} ر.س` : `SAR ${pkg.originalPrice}`}</span>
-                      {showMYR && <span className="text-xs text-muted-foreground line-through">(MYR {toMYR(pkg.originalPrice)})</span>}
+                      <span className="text-sm text-muted-foreground line-through">MYR {pkg.originalPrice}</span>
+                      {showSAR && <span className="text-xs text-muted-foreground line-through">({language === 'ar' ? `≈ ${toSAR(pkg.originalPrice)} ر.س` : `≈ SAR ${toSAR(pkg.originalPrice)}`})</span>}
                     </div>
                     <div className="flex items-baseline gap-2 flex-wrap">
-                      <span className="text-4xl font-black text-primary">{language === 'ar' ? `${pkg.discountedPrice} ر.س` : `SAR ${pkg.discountedPrice}`}</span>
-                      {showMYR && <span className="text-lg font-bold text-muted-foreground">(MYR {toMYR(pkg.discountedPrice)})</span>}
+                      <span className="text-4xl font-black text-primary">MYR {pkg.discountedPrice}</span>
+                      {showSAR && <span className="text-lg font-bold text-muted-foreground">({language === 'ar' ? `≈ ${toSAR(pkg.discountedPrice)} ر.س` : `≈ SAR ${toSAR(pkg.discountedPrice)}`})</span>}
                     </div>
                     {pkg.savings && (
                       <div className="mt-2 inline-flex items-center gap-2 flex-wrap">
                         <span className="inline-flex items-center px-2 py-1 rounded-md bg-green-100 text-green-700 text-xs font-bold">
-                          {language === 'ar' ? `وفر ${pkg.savings} ر.س` : `Save SAR ${pkg.savings}`}
+                          {language === 'ar' ? `وفر MYR ${pkg.savings}` : `Save MYR ${pkg.savings}`}
                         </span>
-                        {showMYR && <span className="text-xs text-green-600 font-medium">(MYR {toMYR(pkg.savings)})</span>}
+                        {showSAR && <span className="text-xs text-green-600 font-medium">({language === 'ar' ? `≈ ${toSAR(pkg.savings)} ر.س` : `≈ SAR ${toSAR(pkg.savings)}`})</span>}
                       </div>
                     )}
                   </div>
@@ -294,12 +294,12 @@ export default function Institutions() {
                   {language === 'ar' ? selectedPkg.nameAr : selectedPkg.nameEn}
                 </h3>
                 <div className="flex items-baseline gap-2 mt-2 flex-wrap">
-                  <span className="text-3xl font-black text-primary">{language === 'ar' ? `${selectedPkg.discountedPrice} ر.س` : `SAR ${selectedPkg.discountedPrice}`}</span>
-                  <span className="text-sm text-muted-foreground line-through">{language === 'ar' ? `${selectedPkg.originalPrice} ر.س` : `SAR ${selectedPkg.originalPrice}`}</span>
+                  <span className="text-3xl font-black text-primary">MYR {selectedPkg.discountedPrice}</span>
+                  <span className="text-sm text-muted-foreground line-through">MYR {selectedPkg.originalPrice}</span>
                 </div>
-                {showMYR && (
+                {showSAR && (
                   <p className="text-xs text-muted-foreground mt-1">
-                    ≈ MYR {toMYR(selectedPkg.discountedPrice)} <span className="opacity-60">({language === 'ar' ? "تقريبي" : "approx."})</span>
+                    {language === 'ar' ? `≈ ${toSAR(selectedPkg.discountedPrice)} ر.س` : `≈ SAR ${toSAR(selectedPkg.discountedPrice)}`} <span className="opacity-60">({language === 'ar' ? "تقريبي" : "approx."})</span>
                   </p>
                 )}
               </div>
@@ -312,8 +312,8 @@ export default function Institutions() {
                 <a
                   href={`https://wa.me/966562022668?text=${encodeURIComponent(
                     language === 'ar' 
-                      ? `أريد الاشتراك في ${selectedPkg.nameAr}\nالسعر: ${selectedPkg.discountedPrice} ر.س\nأريد الدفع عبر تابي (Tabby) - أقساط`
-                      : `I want to subscribe to ${selectedPkg.nameEn}\nPrice: SAR ${selectedPkg.discountedPrice}\nPayment via Tabby - Installments`
+                      ? `أريد الاشتراك في ${selectedPkg.nameAr}\nالسعر: MYR ${selectedPkg.discountedPrice}\nأريد الدفع عبر تابي (Tabby) - أقساط`
+                      : `I want to subscribe to ${selectedPkg.nameEn}\nPrice: MYR ${selectedPkg.discountedPrice}\nPayment via Tabby - Installments`
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -337,8 +337,8 @@ export default function Institutions() {
                 <a
                   href={`https://wa.me/966562022668?text=${encodeURIComponent(
                     language === 'ar'
-                      ? `أريد الاشتراك في ${selectedPkg.nameAr}\nالسعر: ${selectedPkg.discountedPrice} ر.س\nأريد الدفع عبر تمارا (Tamara) - أقساط`
-                      : `I want to subscribe to ${selectedPkg.nameEn}\nPrice: SAR ${selectedPkg.discountedPrice}\nPayment via Tamara - Installments`
+                      ? `أريد الاشتراك في ${selectedPkg.nameAr}\nالسعر: MYR ${selectedPkg.discountedPrice}\nأريد الدفع عبر تمارا (Tamara) - أقساط`
+                      : `I want to subscribe to ${selectedPkg.nameEn}\nPrice: MYR ${selectedPkg.discountedPrice}\nPayment via Tamara - Installments`
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -362,8 +362,8 @@ export default function Institutions() {
                 <a
                   href={`https://wa.me/966562022668?text=${encodeURIComponent(
                     language === 'ar'
-                      ? `أريد الاشتراك في ${selectedPkg.nameAr}\nالسعر: ${selectedPkg.discountedPrice} ر.س\nأريد الدفع عبر تحويل بنكي`
-                      : `I want to subscribe to ${selectedPkg.nameEn}\nPrice: SAR ${selectedPkg.discountedPrice}\nPayment via Bank Transfer`
+                      ? `أريد الاشتراك في ${selectedPkg.nameAr}\nالسعر: MYR ${selectedPkg.discountedPrice}\nأريد الدفع عبر تحويل بنكي`
+                      : `I want to subscribe to ${selectedPkg.nameEn}\nPrice: MYR ${selectedPkg.discountedPrice}\nPayment via Bank Transfer`
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -387,8 +387,8 @@ export default function Institutions() {
                 <a
                   href={`https://wa.me/966562022668?text=${encodeURIComponent(
                     language === 'ar'
-                      ? `أريد الاستفسار عن ${selectedPkg.nameAr}\nالسعر: ${selectedPkg.discountedPrice} ر.س`
-                      : `I want to inquire about ${selectedPkg.nameEn}\nPrice: SAR ${selectedPkg.discountedPrice}`
+                      ? `أريد الاستفسار عن ${selectedPkg.nameAr}\nالسعر: MYR ${selectedPkg.discountedPrice}`
+                      : `I want to inquire about ${selectedPkg.nameEn}\nPrice: MYR ${selectedPkg.discountedPrice}`
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
