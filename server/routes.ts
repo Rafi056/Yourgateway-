@@ -368,6 +368,28 @@ export async function registerRoutes(
     }
   });
 
+  app.get("/sitemap.xml", (req, res) => {
+    const baseUrl = "https://gatewayservicess.com";
+    const urls = [
+      { loc: "/", priority: "1.0", changefreq: "weekly" },
+      { loc: "/institutions", priority: "0.9", changefreq: "weekly" },
+      { loc: "/announcements", priority: "0.7", changefreq: "daily" },
+      { loc: "/dashboard", priority: "0.5", changefreq: "monthly" },
+    ];
+
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.map(u => `  <url>
+    <loc>${baseUrl}${u.loc}</loc>
+    <changefreq>${u.changefreq}</changefreq>
+    <priority>${u.priority}</priority>
+  </url>`).join("\n")}
+</urlset>`;
+
+    res.header("Content-Type", "application/xml");
+    res.send(xml);
+  });
+
   app.get("/api/admin/announcements", async (req, res) => {
     try {
       if (!req.session.adminUserId) {
