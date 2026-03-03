@@ -1,22 +1,34 @@
 import { useState } from "react";
 import { useParams } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { useInstitution } from "@/hooks/use-institutions";
 import { useCreateApplication } from "@/hooks/use-applications";
-import { MapPin, CheckCircle, Loader2, ArrowLeft, ArrowRight, Send } from "lucide-react";
+import { MapPin, CheckCircle, Loader2, ArrowLeft, ArrowRight, Send, Megaphone, Calendar } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/lib/i18n";
+import { motion } from "framer-motion";
 
 export default function InstitutionDetails() {
   const params = useParams();
   const id = parseInt(params.id || "0", 10);
-  const { t, dir } = useLanguage();
+  const { t, dir, language } = useLanguage();
   
   const { data: institution, isLoading, error } = useInstitution(id);
   const { mutate: submitApplication, isPending } = useCreateApplication();
+
+  const { data: institutionAnnouncements } = useQuery({
+    queryKey: ["/api/institutions", id, "announcements"],
+    queryFn: async () => {
+      const res = await fetch(`/api/institutions/${id}/announcements`);
+      if (!res.ok) return [];
+      return res.json();
+    },
+    enabled: !!institution,
+  });
   
   const [formData, setFormData] = useState({
     studentName: "",
@@ -132,6 +144,47 @@ export default function InstitutionDetails() {
                 ))}
               </div>
             </section>
+
+            {institutionAnnouncements && institutionAnnouncements.length > 0 && (
+              <section className={dir === "rtl" ? "text-right" : "text-left"}>
+                <div className={`flex items-center gap-3 mb-6 border-b pb-4 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                  <Megaphone className="w-7 h-7 text-primary" />
+                  <h2 className="font-serif text-3xl font-bold">{t("ann.title")}</h2>
+                </div>
+                <div className="space-y-5">
+                  {institutionAnnouncements.map((ann: any, idx: number) => (
+                    <motion.div
+                      key={ann.id}
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.06 }}
+                      className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm hover:shadow-md transition-shadow"
+                      data-testid={`institution-announcement-${ann.id}`}
+                    >
+                      {ann.imageUrl && (
+                        <div className="h-44 bg-muted overflow-hidden">
+                          <img src={ann.imageUrl} alt="" className="w-full h-full object-cover" />
+                        </div>
+                      )}
+                      <div className="p-5">
+                        <h3 className="font-serif text-lg font-bold mb-2" data-testid={`institution-announcement-title-${ann.id}`}>
+                          {language === "ar" ? ann.titleAr : ann.titleEn}
+                        </h3>
+                        <p className="text-muted-foreground text-sm whitespace-pre-line mb-3">
+                          {language === "ar" ? ann.contentAr : ann.contentEn}
+                        </p>
+                        <div className={`flex items-center gap-2 text-xs text-muted-foreground ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                          <Calendar className="w-3 h-3" />
+                          <span>{new Date(ann.createdAt).toLocaleDateString(language === "ar" ? "ar-SA" : "en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
+                          <span className="opacity-50">•</span>
+                          <span>{t("ann.posted_by")} {language === "ar" ? ann.adminNameAr : ann.adminNameEn}</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </section>
+            )}
           </div>
 
           {/* Application Form Sidebar */}

@@ -282,6 +282,26 @@ export async function registerRoutes(
     });
   });
 
+  app.get("/api/institutions/:id/announcements", async (req, res) => {
+    try {
+      const institutionId = Number(req.params.id);
+      const data = await storage.getAnnouncementsByInstitution(institutionId);
+      const enriched = await Promise.all(
+        data.map(async (ann) => {
+          const admin = ann.adminUserId ? await storage.getAdminById(ann.adminUserId) : null;
+          return {
+            ...ann,
+            adminNameAr: admin?.nameAr || "",
+            adminNameEn: admin?.nameEn || "",
+          };
+        })
+      );
+      res.json(enriched);
+    } catch (err) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.get("/api/announcements", async (req, res) => {
     try {
       const data = await storage.getAnnouncements();

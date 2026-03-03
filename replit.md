@@ -77,9 +77,10 @@ This pattern ensures the frontend and backend agree on types and validation with
 
 ### Announcements System
 
+- **Inside Institution Pages**: Each institution's detail page (`/institutions/:id`) shows its own announcements below the "Why Us" section. Only appears when the institution has announcements.
 - **Public Page** (`/announcements`): Displays all institute announcements as cards sorted by newest first. Shows title, content, institution name, admin name, date, and optional image. Bilingual AR/EN.
 - **Admin Panel** (`/admin`): Login form → create/delete announcements. Each admin sees only their own announcements. Form requires bilingual title + content, optional image URL.
-- **API Routes**: `GET /api/announcements`, `POST /api/announcements` (auth), `DELETE /api/announcements/:id` (auth, own only), `GET /api/admin/announcements` (auth)
+- **API Routes**: `GET /api/announcements`, `GET /api/institutions/:id/announcements`, `POST /api/announcements` (auth), `DELETE /api/announcements/:id` (auth, own only), `GET /api/admin/announcements` (auth)
 - **DB Tables**: `admin_users` (username, passwordHash, institutionId FK, nameAr, nameEn), `announcements` (institutionId FK, adminUserId FK, titleAr, titleEn, contentAr, contentEn, imageUrl, createdAt)
 
 ---

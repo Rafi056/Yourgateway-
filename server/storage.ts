@@ -32,6 +32,7 @@ export interface IStorage {
   createAdminUser(admin: InsertAdminUser): Promise<AdminUser>;
 
   getAnnouncements(): Promise<Announcement[]>;
+  getAnnouncementsByInstitution(institutionId: number): Promise<Announcement[]>;
   getAnnouncementsByAdmin(adminUserId: number): Promise<Announcement[]>;
   createAnnouncement(ann: InsertAnnouncement): Promise<Announcement>;
   deleteAnnouncement(id: number): Promise<void>;
@@ -91,6 +92,10 @@ export class DatabaseStorage implements IStorage {
 
   async getAnnouncements(): Promise<Announcement[]> {
     return await db.select().from(announcements).orderBy(desc(announcements.createdAt));
+  }
+
+  async getAnnouncementsByInstitution(institutionId: number): Promise<Announcement[]> {
+    return await db.select().from(announcements).where(eq(announcements.institutionId, institutionId)).orderBy(desc(announcements.createdAt));
   }
 
   async getAnnouncementsByAdmin(adminUserId: number): Promise<Announcement[]> {
