@@ -3,12 +3,18 @@ import {
   institutions,
   applications,
   packages,
+  adminUsers,
+  announcements,
   type Institution,
   type InsertInstitution,
   type Application,
   type InsertApplication,
+  type AdminUser,
+  type InsertAdminUser,
+  type Announcement,
+  type InsertAnnouncement,
 } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   getInstitutions(type?: string): Promise<Institution[]>;
@@ -20,6 +26,16 @@ export interface IStorage {
   getApplication(id: number): Promise<Application | undefined>;
 
   getPackages(): Promise<any[]>;
+
+  getAdminByUsername(username: string): Promise<AdminUser | undefined>;
+  getAdminById(id: number): Promise<AdminUser | undefined>;
+  createAdminUser(admin: InsertAdminUser): Promise<AdminUser>;
+
+  getAnnouncements(): Promise<Announcement[]>;
+  getAnnouncementsByAdmin(adminUserId: number): Promise<Announcement[]>;
+  createAnnouncement(ann: InsertAnnouncement): Promise<Announcement>;
+  deleteAnnouncement(id: number): Promise<void>;
+  getAnnouncement(id: number): Promise<Announcement | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -56,6 +72,43 @@ export class DatabaseStorage implements IStorage {
 
   async getPackages(): Promise<any[]> {
     return await db.select().from(packages);
+  }
+
+  async getAdminByUsername(username: string): Promise<AdminUser | undefined> {
+    const [admin] = await db.select().from(adminUsers).where(eq(adminUsers.username, username));
+    return admin;
+  }
+
+  async getAdminById(id: number): Promise<AdminUser | undefined> {
+    const [admin] = await db.select().from(adminUsers).where(eq(adminUsers.id, id));
+    return admin;
+  }
+
+  async createAdminUser(admin: InsertAdminUser): Promise<AdminUser> {
+    const [user] = await db.insert(adminUsers).values(admin).returning();
+    return user;
+  }
+
+  async getAnnouncements(): Promise<Announcement[]> {
+    return await db.select().from(announcements).orderBy(desc(announcements.createdAt));
+  }
+
+  async getAnnouncementsByAdmin(adminUserId: number): Promise<Announcement[]> {
+    return await db.select().from(announcements).where(eq(announcements.adminUserId, adminUserId)).orderBy(desc(announcements.createdAt));
+  }
+
+  async createAnnouncement(ann: InsertAnnouncement): Promise<Announcement> {
+    const [announcement] = await db.insert(announcements).values(ann).returning();
+    return announcement;
+  }
+
+  async deleteAnnouncement(id: number): Promise<void> {
+    await db.delete(announcements).where(eq(announcements.id, id));
+  }
+
+  async getAnnouncement(id: number): Promise<Announcement | undefined> {
+    const [announcement] = await db.select().from(announcements).where(eq(announcements.id, id));
+    return announcement;
   }
 }
 

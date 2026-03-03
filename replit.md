@@ -38,6 +38,8 @@ Preferred communication style: Simple, everyday language.
 - `/institutions` — Filterable list of universities, language centers, and packages
 - `/institutions/:id` — Institution detail + application form
 - `/dashboard` — View all submitted applications
+- `/announcements` — Public institute announcements feed
+- `/admin` — Admin login + announcement management panel
 
 ### Backend Architecture
 
@@ -69,7 +71,16 @@ This pattern ensures the frontend and backend agree on types and validation with
 
 ### Authentication
 
-No authentication system is currently implemented. The dashboard shows all applications globally (no per-user filtering). This is a known gap if user accounts are needed later.
+- **Admin Authentication**: Institute admins authenticate via `express-session` (cookie-based, SESSION_SECRET env var). Login/logout endpoints at `/api/admin/login` and `/api/admin/logout`. Session data includes `adminUserId`. Cookies use `httpOnly`, `sameSite: lax`, and `secure` in production.
+- **Demo Admin Accounts**: Seeded on startup — `admin1`/`admin123` (Britannia Language Centre), `admin2`/`admin123` (Sheffield Academy).
+- **Student Auth**: Not implemented. The dashboard shows all applications globally.
+
+### Announcements System
+
+- **Public Page** (`/announcements`): Displays all institute announcements as cards sorted by newest first. Shows title, content, institution name, admin name, date, and optional image. Bilingual AR/EN.
+- **Admin Panel** (`/admin`): Login form → create/delete announcements. Each admin sees only their own announcements. Form requires bilingual title + content, optional image URL.
+- **API Routes**: `GET /api/announcements`, `POST /api/announcements` (auth), `DELETE /api/announcements/:id` (auth, own only), `GET /api/admin/announcements` (auth)
+- **DB Tables**: `admin_users` (username, passwordHash, institutionId FK, nameAr, nameEn), `announcements` (institutionId FK, adminUserId FK, titleAr, titleEn, contentAr, contentEn, imageUrl, createdAt)
 
 ---
 
@@ -90,6 +101,7 @@ No authentication system is currently implemented. The dashboard shows all appli
 | Forms | `react-hook-form`, `@hookform/resolvers` |
 | Animation | `framer-motion` |
 | Data fetching | `@tanstack/react-query` |
+| Auth | `bcryptjs`, `express-session` |
 | Database | `drizzle-orm`, `drizzle-zod`, `pg`, `connect-pg-simple` |
 | Validation | `zod`, `zod-validation-error` |
 | Routing | `wouter` |
@@ -101,6 +113,7 @@ No authentication system is currently implemented. The dashboard shows all appli
 | Variable | Required | Purpose |
 |---|---|---|
 | `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `SESSION_SECRET` | Yes | Secret key for express-session cookie signing |
 | `NODE_ENV` | No | Controls dev vs. production mode |
 | `REPL_ID` | No | Enables Replit-specific Vite plugins (cartographer, dev banner) |
 

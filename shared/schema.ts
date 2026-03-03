@@ -1,4 +1,4 @@
-import { pgTable, text, serial, varchar, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, varchar, timestamp, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -48,6 +48,35 @@ export type InsertInstitution = z.infer<typeof insertInstitutionSchema>;
 
 export type Application = typeof applications.$inferSelect;
 export type InsertApplication = z.infer<typeof insertApplicationSchema>;
+
+export const adminUsers = pgTable("admin_users", {
+  id: serial("id").primaryKey(),
+  username: text("username").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  institutionId: integer("institution_id").references(() => institutions.id),
+  nameAr: text("name_ar").notNull(),
+  nameEn: text("name_en").notNull(),
+});
+
+export const announcements = pgTable("announcements", {
+  id: serial("id").primaryKey(),
+  institutionId: integer("institution_id").references(() => institutions.id),
+  adminUserId: integer("admin_user_id").references(() => adminUsers.id),
+  titleAr: text("title_ar").notNull(),
+  titleEn: text("title_en").notNull(),
+  contentAr: text("content_ar").notNull(),
+  contentEn: text("content_en").notNull(),
+  imageUrl: text("image_url"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertAdminUserSchema = createInsertSchema(adminUsers).omit({ id: true });
+export const insertAnnouncementSchema = createInsertSchema(announcements).omit({ id: true, createdAt: true });
+
+export type AdminUser = typeof adminUsers.$inferSelect;
+export type InsertAdminUser = z.infer<typeof insertAdminUserSchema>;
+export type Announcement = typeof announcements.$inferSelect;
+export type InsertAnnouncement = z.infer<typeof insertAnnouncementSchema>;
 
 // Contract Types
 export type CreateApplicationRequest = InsertApplication;

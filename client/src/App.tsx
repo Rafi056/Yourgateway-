@@ -10,6 +10,8 @@ import Home from "./pages/Home";
 import Institutions from "./pages/Institutions";
 import InstitutionDetails from "./pages/InstitutionDetails";
 import Dashboard from "./pages/Dashboard";
+import Announcements from "./pages/Announcements";
+import AdminPanel from "./pages/AdminPanel";
 
 // Components
 import { Navbar } from "@/components/layout/Navbar";
@@ -25,6 +27,8 @@ function Router() {
       <Route path="/institutions" component={Institutions} />
       <Route path="/institutions/:id" component={InstitutionDetails} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/announcements" component={Announcements} />
+      <Route path="/admin" component={AdminPanel} />
       <Route component={NotFound} />
     </Switch>
   );

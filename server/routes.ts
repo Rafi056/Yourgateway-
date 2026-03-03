@@ -1,10 +1,11 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
 import { db } from "./db";
-import { packages } from "@shared/schema";
+import { packages, adminUsers, insertAnnouncementSchema } from "@shared/schema";
+import bcrypt from "bcryptjs";
 
 async function seedDatabase() {
   const existing = await storage.getInstitutions();
@@ -116,6 +117,28 @@ async function seedDatabase() {
       await db.insert(packages).values(pkg);
     }
   }
+
+  const existingAdmins = await storage.getAdminByUsername("admin1");
+  if (!existingAdmins) {
+    const allInstitutions = await storage.getInstitutions("language_center");
+    const hash = await bcrypt.hash("admin123", 10);
+    if (allInstitutions.length >= 2) {
+      await storage.createAdminUser({
+        username: "admin1",
+        passwordHash: hash,
+        institutionId: allInstitutions[0].id,
+        nameAr: "مدير معهد بريتانيا",
+        nameEn: "Britannia Admin",
+      });
+      await storage.createAdminUser({
+        username: "admin2",
+        passwordHash: hash,
+        institutionId: allInstitutions[1].id,
+        nameAr: "مدير معهد شيفيلد",
+        nameEn: "Sheffield Admin",
+      });
+    }
+  }
 }
 
 export async function registerRoutes(
@@ -194,6 +217,143 @@ export async function registerRoutes(
       if (!data) {
         return res.status(404).json({ message: "Application not found" });
       }
+      res.json(data);
+    } catch (err) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/admin/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      if (!username || !password) {
+        return res.status(400).json({ message: "Username and password required" });
+      }
+      const admin = await storage.getAdminByUsername(username);
+      if (!admin) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+      const valid = await bcrypt.compare(password, admin.passwordHash);
+      if (!valid) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+      req.session.adminUserId = admin.id;
+      const institution = await storage.getInstitution(admin.institutionId!);
+      res.json({
+        id: admin.id,
+        username: admin.username,
+        nameAr: admin.nameAr,
+        nameEn: admin.nameEn,
+        institutionId: admin.institutionId,
+        institutionName: institution?.name || "",
+      });
+    } catch (err) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/admin/me", async (req, res) => {
+    try {
+      if (!req.session.adminUserId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+      const admin = await storage.getAdminById(req.session.adminUserId);
+      if (!admin) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+      const institution = await storage.getInstitution(admin.institutionId!);
+      res.json({
+        id: admin.id,
+        username: admin.username,
+        nameAr: admin.nameAr,
+        nameEn: admin.nameEn,
+        institutionId: admin.institutionId,
+        institutionName: institution?.name || "",
+      });
+    } catch (err) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/admin/logout", (req, res) => {
+    req.session.destroy((err) => {
+      if (err) return res.status(500).json({ message: "Logout failed" });
+      res.json({ message: "Logged out" });
+    });
+  });
+
+  app.get("/api/announcements", async (req, res) => {
+    try {
+      const data = await storage.getAnnouncements();
+      const enriched = await Promise.all(
+        data.map(async (ann) => {
+          const admin = ann.adminUserId ? await storage.getAdminById(ann.adminUserId) : null;
+          const institution = ann.institutionId ? await storage.getInstitution(ann.institutionId) : null;
+          return {
+            ...ann,
+            adminNameAr: admin?.nameAr || "",
+            adminNameEn: admin?.nameEn || "",
+            institutionName: institution?.name || "",
+          };
+        })
+      );
+      res.json(enriched);
+    } catch (err) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/announcements", async (req, res) => {
+    try {
+      if (!req.session.adminUserId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+      const admin = await storage.getAdminById(req.session.adminUserId);
+      if (!admin) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+      const validated = insertAnnouncementSchema.parse({
+        ...req.body,
+        institutionId: admin.institutionId,
+        adminUserId: admin.id,
+        imageUrl: req.body.imageUrl || null,
+      });
+      const announcement = await storage.createAnnouncement(validated);
+      res.status(201).json(announcement);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message, field: err.errors[0].path.join('.') });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/announcements/:id", async (req, res) => {
+    try {
+      if (!req.session.adminUserId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+      const id = Number(req.params.id);
+      const announcement = await storage.getAnnouncement(id);
+      if (!announcement) {
+        return res.status(404).json({ message: "Announcement not found" });
+      }
+      if (announcement.adminUserId !== req.session.adminUserId) {
+        return res.status(403).json({ message: "Not authorized" });
+      }
+      await storage.deleteAnnouncement(id);
+      res.json({ message: "Deleted" });
+    } catch (err) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/admin/announcements", async (req, res) => {
+    try {
+      if (!req.session.adminUserId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+      const data = await storage.getAnnouncementsByAdmin(req.session.adminUserId);
       res.json(data);
     } catch (err) {
       res.status(500).json({ message: "Internal server error" });
