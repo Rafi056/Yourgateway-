@@ -113,7 +113,7 @@ export default function AdminPanel() {
 
   if (checkingAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-muted/30">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
@@ -132,8 +132,12 @@ export default function AdminPanel() {
               <Lock className="w-8 h-8 text-primary" />
             </div>
           </div>
-          <h2 className="font-serif text-2xl font-bold text-center mb-2">{t("ann.admin_login")}</h2>
-          <p className="text-muted-foreground text-center text-sm mb-8">{t("ann.admin_panel")}</p>
+          <h2 className="font-serif text-2xl font-bold text-center mb-2">
+            {language === "ar" ? "بوابة إدارة الإعلانات" : "Announcements Management Portal"}
+          </h2>
+          <p className="text-muted-foreground text-center text-sm mb-8">
+            {language === "ar" ? "سجل دخولك لإضافة إعلانات المعهد" : "Sign in to manage your institution announcements"}
+          </p>
 
           <form onSubmit={(e) => { e.preventDefault(); loginMutation.mutate(); }} className="space-y-4">
             <div>
@@ -168,18 +172,21 @@ export default function AdminPanel() {
   }
 
   return (
-    <div className={`min-h-screen bg-muted/30 pb-20 ${dir === "rtl" ? "text-right" : "text-left"}`}>
-      <div className="bg-primary text-primary-foreground py-12">
+    <div className={`min-h-screen bg-muted/30 ${dir === "rtl" ? "text-right" : "text-left"}`}>
+      <div className="bg-primary text-primary-foreground py-6">
         <div className="container mx-auto px-4 md:px-6">
           <div className={`flex items-center justify-between ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
             <div>
-              <h1 className="font-serif text-3xl font-bold mb-1">{t("ann.admin_panel")}</h1>
-              <p className="text-white/80">
-                {t("ann.welcome")}، {language === "ar" ? admin.nameAr : admin.nameEn} — {admin.institutionName}
+              <h1 className="font-serif text-xl font-bold">
+                {language === "ar" ? "إدارة الإعلانات" : "Announcements Management"}
+              </h1>
+              <p className="text-white/80 text-sm">
+                {language === "ar" ? admin.nameAr : admin.nameEn} — {admin.institutionName}
               </p>
             </div>
             <Button
               variant="outline"
+              size="sm"
               onClick={() => logoutMutation.mutate()}
               className={`flex items-center gap-2 bg-white/10 border-white/20 text-white hover:bg-white/20 ${dir === "rtl" ? "flex-row-reverse" : ""}`}
               data-testid="btn-logout"
@@ -191,8 +198,8 @@ export default function AdminPanel() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 md:px-6 mt-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="container mx-auto px-4 md:px-6 py-8">
+        <div className="max-w-2xl mx-auto space-y-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
