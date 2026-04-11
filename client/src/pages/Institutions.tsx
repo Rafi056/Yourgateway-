@@ -210,12 +210,12 @@ export default function Institutions() {
                 transition={{ delay: idx * 0.1 }}
               >
                 <div className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm hover:shadow-xl transition-all duration-300 group flex flex-col h-full">
-                  <div className="h-48 bg-muted relative overflow-hidden">
+                  <div className="h-48 bg-white relative overflow-hidden">
                     {inst.imageUrl ? (
                       <img 
                         src={inst.imageUrl} 
                         alt={inst.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-primary/5 text-primary">
