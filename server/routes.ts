@@ -148,6 +148,47 @@ export async function registerRoutes(
   // Seed the DB
   seedDatabase().catch(console.error);
 
+  app.get("/sitemap.xml", async (_req, res) => {
+    try {
+      const baseUrl = "https://gatewayservicess.com";
+      const today = new Date().toISOString().split("T")[0];
+      const institutions = await storage.getInstitutions();
+
+      const staticPages = [
+        { url: "/", priority: "1.0", changefreq: "weekly" },
+        { url: "/institutions", priority: "0.9", changefreq: "weekly" },
+        { url: "/announcements", priority: "0.7", changefreq: "daily" },
+      ];
+
+      const institutionPages = institutions.map((inst) => ({
+        url: `/institutions/${inst.id}`,
+        priority: "0.6",
+        changefreq: "monthly",
+      }));
+
+      const allPages = [...staticPages, ...institutionPages];
+
+      const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${allPages
+  .map(
+    (page) => `  <url>
+    <loc>${baseUrl}${page.url}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${page.priority}</priority>
+  </url>`
+  )
+  .join("\n")}
+</urlset>`;
+
+      res.header("Content-Type", "application/xml");
+      res.send(xml);
+    } catch (err) {
+      res.status(500).send("Error generating sitemap");
+    }
+  });
+
   app.get("/api/packages", async (req, res) => {
     try {
       const data = await storage.getPackages();
