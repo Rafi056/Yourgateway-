@@ -12,6 +12,7 @@ import InstitutionDetails from "./pages/InstitutionDetails";
 import Dashboard from "./pages/Dashboard";
 import Announcements from "./pages/Announcements";
 import AdminPanel from "./pages/AdminPanel";
+import Terms from "./pages/Terms";
 
 // Components
 import { Navbar } from "@/components/layout/Navbar";
@@ -29,6 +30,7 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/announcements" component={Announcements} />
       <Route path="/admin" component={AdminPanel} />
+      <Route path="/terms" component={Terms} />
       <Route component={NotFound} />
     </Switch>
   );

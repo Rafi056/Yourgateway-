@@ -384,35 +384,39 @@ export default function Institutions() {
                   </Button>
                 </a>
 
-                <a
-                  href={`https://wa.me/966562022668?text=${encodeURIComponent(
-                    language === 'ar'
-                      ? `أريد الاستفسار عن ${selectedPkg.nameAr}\nالسعر: MYR ${selectedPkg.discountedPrice}`
-                      : `I want to inquire about ${selectedPkg.nameEn}\nPrice: MYR ${selectedPkg.discountedPrice}`
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block"
-                  data-testid="btn-pay-whatsapp"
-                >
-                  <Button className={`w-full py-5 text-base font-bold justify-between bg-[#25D366] hover:bg-[#128C7E] ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
-                    <div className={`flex items-center gap-3 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
-                      <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-                        <MessageCircle className="w-5 h-5 text-white" />
+                <div className="border-t border-border pt-3">
+                  <p className="text-xs text-muted-foreground mb-2 text-center">
+                    {language === 'ar' ? "هل لديك سؤال قبل الشراء؟" : "Have a question before buying?"}
+                  </p>
+                  <a
+                    href={`https://wa.me/966562022668?text=${encodeURIComponent(
+                      language === 'ar'
+                        ? `أريد الاستفسار عن ${selectedPkg.nameAr} قبل الشراء`
+                        : `I want to inquire about ${selectedPkg.nameEn} before purchasing`
+                    )}`}
+                    target="_blank" rel="noopener noreferrer"
+                    className="block" data-testid="btn-inquiry-whatsapp"
+                  >
+                    <Button variant="outline" className={`w-full py-4 text-sm font-bold justify-between border border-[#25D366]/40 hover:border-[#25D366] hover:bg-[#25D366]/5 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                      <div className={`flex items-center gap-3 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                        <MessageCircle className="w-5 h-5 text-[#25D366]" />
+                        <span className="text-[#25D366]">{language === 'ar' ? "استفسار عبر الواتساب" : "WhatsApp Inquiry"}</span>
                       </div>
-                      <div className={dir === "rtl" ? "text-right" : "text-left"}>
-                        <span className="block font-bold text-white">{language === 'ar' ? "تواصل عبر واتساب" : "Chat on WhatsApp"}</span>
-                        <span className="text-xs text-white/80">{language === 'ar' ? "استفسر أو ادفع مباشرة" : "Inquire or pay directly"}</span>
-                      </div>
-                    </div>
-                    <ArrowLeft className={`w-4 h-4 text-white ${dir === "rtl" ? "" : "rotate-180"}`} />
-                  </Button>
-                </a>
+                      <ArrowLeft className={`w-4 h-4 text-[#25D366] ${dir === "rtl" ? "" : "rotate-180"}`} />
+                    </Button>
+                  </a>
+                </div>
               </div>
 
-              <p className="text-xs text-center text-muted-foreground mt-6">
-                {language === 'ar' ? "سيتم توجيهك للواتساب لإتمام عملية الدفع مع فريقنا" : "You will be redirected to WhatsApp to complete payment with our team"}
-              </p>
+              <div className={`mt-6 flex items-center justify-center gap-4 text-xs text-muted-foreground ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                <a href="/terms" className="underline hover:text-foreground transition-colors">
+                  {language === 'ar' ? "الشروط والأحكام" : "Terms & Conditions"}
+                </a>
+                <span>•</span>
+                <a href="/terms#refund" className="underline hover:text-foreground transition-colors">
+                  {language === 'ar' ? "سياسة الاسترجاع" : "Refund Policy"}
+                </a>
+              </div>
             </motion.div>
           </motion.div>
         )}

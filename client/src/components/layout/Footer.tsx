@@ -41,7 +41,16 @@ export function Footer() {
             <ul className="space-y-4 text-white/70">
               <li><a href="https://wa.me/966562022668" className="hover:text-secondary transition-colors">{t("footer.whatsapp")}</a></li>
               <li><a href="https://direct.me/gatemalay" className="hover:text-secondary transition-colors">{t("footer.social")}</a></li>
-              <li><a href="#" className="hover:text-secondary transition-colors">{t("footer.faq")}</a></li>
+              <li>
+                <Link href="/terms" className="hover:text-secondary transition-colors">
+                  {t("footer.terms")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms#refund" className="hover:text-secondary transition-colors">
+                  {t("footer.refund")}
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
