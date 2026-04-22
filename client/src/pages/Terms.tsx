@@ -59,93 +59,70 @@ export default function Terms() {
             </h2>
           </div>
 
-          <div className="space-y-4 text-muted-foreground leading-relaxed">
-            <div>
-              <h3 className="font-bold text-foreground mb-2">{ar ? "١. القبول بالشروط" : "1. Acceptance of Terms"}</h3>
-              <p>
-                {ar
-                  ? "باستخدامك لموقع Gateway Services أو خدماتنا، فأنت توافق على الالتزام بهذه الشروط والأحكام. إذا كنت لا توافق على أي جزء من هذه الشروط، يرجى عدم استخدام خدماتنا."
-                  : "By using Gateway Services website or our services, you agree to be bound by these terms and conditions. If you do not agree to any part of these terms, please do not use our services."}
-              </p>
-            </div>
+          <p className="text-muted-foreground leading-relaxed mb-6">
+            {ar
+              ? "باستخدامك لهذا الموقع أو طلبك لأي من خدماتنا، فإنك توافق على الشروط التالية:"
+              : "By using this website or requesting any of our services, you agree to the following terms:"}
+          </p>
 
+          <div className="space-y-5 text-muted-foreground leading-relaxed">
             <div>
-              <h3 className="font-bold text-foreground mb-2">{ar ? "٢. وصف الخدمة" : "2. Service Description"}</h3>
-              <p>
-                {ar
-                  ? "تقدم Gateway Services خدمات التوجيه التعليمي للطلاب الراغبين في الدراسة في ماليزيا، بما في ذلك التسجيل في الجامعات ومعاهد اللغة الإنجليزية، وخدمات الاستقبال والدعم اللوجستي."
-                  : "Gateway Services provides educational guidance services for students wishing to study in Malaysia, including registration at universities and English language institutes, as well as reception and logistical support services."}
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-bold text-foreground mb-2">{ar ? "٣. الباقات والأسعار" : "3. Packages & Pricing"}</h3>
-              <p>
-                {ar
-                  ? "جميع الأسعار المذكورة بالرينجيت الماليزي (MYR). الأسعار المعروضة بالريال السعودي هي أسعار تقريبية تخضع لتغييرات سعر الصرف. تحتفظ الشركة بحق تعديل الأسعار دون إشعار مسبق مع الحفاظ على حقوق العملاء الذين أتموا عمليات الشراء."
-                  : "All prices are listed in Malaysian Ringgit (MYR). Prices shown in Saudi Riyal are approximate and subject to exchange rate changes. The company reserves the right to modify prices without prior notice while preserving the rights of customers who have completed purchases."}
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-bold text-foreground mb-2">{ar ? "٤. التزامات العميل" : "4. Client Obligations"}</h3>
-              <ul className={`space-y-2 ${dir === "rtl" ? "pr-4" : "pl-4"}`}>
-                <li className={`flex items-start gap-2 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
-                  <span className="text-primary mt-1">•</span>
-                  <span>{ar ? "تقديم معلومات صحيحة ودقيقة عند التسجيل" : "Provide accurate and correct information when registering"}</span>
-                </li>
-                <li className={`flex items-start gap-2 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
-                  <span className="text-primary mt-1">•</span>
-                  <span>{ar ? "الالتزام بمتطلبات الجهات التعليمية والسلطات الماليزية" : "Comply with the requirements of educational institutions and Malaysian authorities"}</span>
-                </li>
-                <li className={`flex items-start gap-2 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
-                  <span className="text-primary mt-1">•</span>
-                  <span>{ar ? "إبلاغ الشركة فوراً عن أي تغييرات في المعلومات الشخصية" : "Immediately notify the company of any changes in personal information"}</span>
-                </li>
-                <li className={`flex items-start gap-2 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
-                  <span className="text-primary mt-1">•</span>
-                  <span>{ar ? "إتمام الدفع كاملاً قبل بدء تقديم الخدمة" : "Complete payment in full before service delivery begins"}</span>
-                </li>
+              <h3 className="font-bold text-foreground mb-2">{ar ? "١. طبيعة الخدمة" : "1. Nature of Service"}</h3>
+              <p className="mb-2">{ar ? "نقدم خدمات مساعدة للطلاب تشمل:" : "We provide student assistance services including:"}</p>
+              <ul className="space-y-1.5">
+                {(ar ? [
+                  "القبول في المعاهد أو الجامعات في ماليزيا",
+                  "ترتيبات السكن",
+                  "الاستقبال من المطار",
+                  "توفير معلومات وخدمات مساندة للطالب",
+                ] : [
+                  "Admission to institutes or universities in Malaysia",
+                  "Accommodation arrangements",
+                  "Airport reception",
+                  "Providing information and student support services",
+                ]).map((item, i) => (
+                  <li key={i} className={`flex items-start gap-2 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                    <span className="text-primary mt-1">•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
               </ul>
             </div>
 
             <div>
-              <h3 className="font-bold text-foreground mb-2">{ar ? "٥. حدود المسؤولية" : "5. Limitation of Liability"}</h3>
+              <h3 className="font-bold text-foreground mb-2">{ar ? "٢. استخدام الخدمة" : "2. Use of Service"}</h3>
               <p>
                 {ar
-                  ? "تسعى Gateway Services لتقديم أفضل الخدمات، غير أنها لا تتحمل المسؤولية عن قرارات القبول النهائية من قِبل الجامعات أو المعاهد، أو أي تغييرات في سياسات الجهات التعليمية، أو ظروف خارجة عن إرادتها."
-                  : "Gateway Services strives to provide the best services, however it is not responsible for final admission decisions by universities or institutes, any changes in educational institution policies, or circumstances beyond its control."}
+                  ? "الخدمة مخصصة للطلاب الراغبين بالدراسة في ماليزيا، ويجب تقديم معلومات صحيحة عند التسجيل."
+                  : "The service is intended for students wishing to study in Malaysia, and accurate information must be provided upon registration."}
               </p>
             </div>
 
             <div>
-              <h3 className="font-bold text-foreground mb-2">{ar ? "٦. طرق الدفع" : "6. Payment Methods"}</h3>
-              <p className="mb-3">
-                {ar ? "نقبل طرق الدفع التالية:" : "We accept the following payment methods:"}
+              <h3 className="font-bold text-foreground mb-2">{ar ? "٣. المسؤولية" : "3. Liability"}</h3>
+              <p>
+                {ar
+                  ? "نحن نعمل كوسيط ومقدم خدمة تنسيق، ولا نتحمل مسؤولية رفض الطلب من الجهة التعليمية إذا كان بسبب شروط الجهة نفسها."
+                  : "We operate as an intermediary and coordination service provider. We are not responsible for application rejections by the educational institution if they result from the institution's own requirements."}
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="bg-muted rounded-2xl p-4 text-center border border-border">
-                  <div className="w-8 h-8 rounded-xl bg-[#3FCEA0]/20 flex items-center justify-center mx-auto mb-2">
-                    <span className="text-[#3FCEA0] font-bold text-sm">T</span>
-                  </div>
-                  <p className="font-bold text-foreground text-sm">Tabby</p>
-                  <p className="text-xs text-muted-foreground">{ar ? "4 أقساط بدون فوائد" : "4 interest-free installments"}</p>
-                </div>
-                <div className="bg-muted rounded-2xl p-4 text-center border border-border">
-                  <div className="w-8 h-8 rounded-xl bg-[#F5A623]/20 flex items-center justify-center mx-auto mb-2">
-                    <span className="text-[#F5A623] font-bold text-sm">T</span>
-                  </div>
-                  <p className="font-bold text-foreground text-sm">Tamara</p>
-                  <p className="text-xs text-muted-foreground">{ar ? "3 أقساط بدون فوائد" : "3 interest-free installments"}</p>
-                </div>
-                <div className="bg-muted rounded-2xl p-4 text-center border border-border">
-                  <div className="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center mx-auto mb-2">
-                    <span className="text-primary font-bold text-sm">B</span>
-                  </div>
-                  <p className="font-bold text-foreground text-sm">{ar ? "تحويل بنكي" : "Bank Transfer"}</p>
-                  <p className="text-xs text-muted-foreground">{ar ? "دفعة واحدة كاملة" : "Full payment"}</p>
-                </div>
-              </div>
+            </div>
+
+            <div>
+              <h3 className="font-bold text-foreground mb-2">{ar ? "٤. الدفع (إن وجد مستقبلاً)" : "4. Payment (If Applicable in the Future)"}</h3>
+              <p>
+                {ar
+                  ? "في حال وجود رسوم خدمة أو باقات مدفوعة، يتم توضيحها قبل إتمام الطلب."
+                  : "If there are service fees or paid packages, they will be clarified before completing the request."}
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-bold text-foreground mb-2">{ar ? "٥. التعديلات" : "5. Amendments"}</h3>
+              <p>
+                {ar
+                  ? "نحتفظ بحق تعديل الشروط في أي وقت دون إشعار مسبق."
+                  : "We reserve the right to modify these terms at any time without prior notice."}
+              </p>
             </div>
           </div>
         </motion.section>
