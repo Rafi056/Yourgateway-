@@ -5,7 +5,7 @@ import { api } from "@shared/routes";
 import { z } from "zod";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
-import { packages, adminUsers, insertAnnouncementSchema } from "@shared/schema";
+import { packages, adminUsers, insertAnnouncementSchema, institutions } from "@shared/schema";
 import bcrypt from "bcryptjs";
 
 async function seedDatabase() {
@@ -39,6 +39,42 @@ async function seedDatabase() {
         location: "Malaysia",
         imageUrl: null,
       });
+    }
+  }
+
+  // Always sync institution image URLs
+  const imageMap: Record<string, string> = {
+    "APU": "/universities/apu.jpeg",
+    "Taylor's": "/universities/taylors.jpeg",
+    "UCSI": "/universities/ucsi.jpeg",
+    "UNITEN": "/universities/uniten.jpeg",
+    "Lincoln": "/universities/lincoln.jpeg",
+    "City": "/universities/city.jpeg",
+    "MMU": "/universities/mmu.jpeg",
+    "MSU": "/universities/msu.jpeg",
+    "SEGI": "/universities/segi.jpeg",
+    "Cyberjaya": "/universities/cyberjaya.jpeg",
+    "Mahsa": "/universities/mahsa.jpeg",
+    "Geometika": "/universities/geometika.jpeg",
+    "IIUM": "/universities/iium.jpeg",
+    "Monash": "/universities/monash.jpeg",
+    "UKM": "/universities/ukm.jpeg",
+    "Al-Madinah": "/universities/almadinah.jpeg",
+    "Britannia Language Centre": "/universities/britannia.jpeg",
+    "Sheffield Academy": "/universities/sheffield.jpeg",
+    "EMS Language Centre": "/universities/ems.jpeg",
+    "Bright Language Center": "/universities/bright.jpeg",
+    "Big Ben Academy": "/universities/bigben.jpeg",
+    "EXCEL Language Center": "/universities/excel.jpeg",
+    "Erican Language Center": "/universities/erican.jpeg",
+    "Webster Language Center": "/universities/webster.jpeg",
+    "Study circle language center": "/universities/studycircle.jpeg",
+  };
+  const allInstitutionsForImages = await storage.getInstitutions();
+  for (const inst of allInstitutionsForImages) {
+    const img = imageMap[inst.name];
+    if (img && inst.imageUrl !== img) {
+      await db.update(institutions).set({ imageUrl: img }).where(eq(institutions.id, inst.id));
     }
   }
 
