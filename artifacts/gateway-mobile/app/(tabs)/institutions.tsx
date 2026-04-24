@@ -19,6 +19,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useColors } from "@/hooks/useColors";
 
 const WHATSAPP_SA = "966562022668";
+const BASE_URL = `https://${process.env.EXPO_PUBLIC_DOMAIN}`;
 
 interface Institution {
   id: number;
@@ -37,12 +38,39 @@ function openWhatsApp(name: string, isRTL: boolean) {
   Linking.openURL(`https://wa.me/${WHATSAPP_SA}?text=${encodeURIComponent(msg)}`);
 }
 
-const BASE_URL = `https://${process.env.EXPO_PUBLIC_DOMAIN}`;
+const LOCAL_IMAGES: Record<string, ReturnType<typeof require>> = {
+  "/universities/apu.jpeg": require("@/assets/universities/apu.jpeg"),
+  "/universities/taylors.jpeg": require("@/assets/universities/taylors.jpeg"),
+  "/universities/ucsi.jpeg": require("@/assets/universities/ucsi.jpeg"),
+  "/universities/uniten.jpeg": require("@/assets/universities/uniten.jpeg"),
+  "/universities/lincoln.jpeg": require("@/assets/universities/lincoln.jpeg"),
+  "/universities/city.jpeg": require("@/assets/universities/city.jpeg"),
+  "/universities/mmu.jpeg": require("@/assets/universities/mmu.jpeg"),
+  "/universities/msu.jpeg": require("@/assets/universities/msu.jpeg"),
+  "/universities/segi.jpeg": require("@/assets/universities/segi.jpeg"),
+  "/universities/cyberjaya.jpeg": require("@/assets/universities/cyberjaya.jpeg"),
+  "/universities/mahsa.jpeg": require("@/assets/universities/mahsa.jpeg"),
+  "/universities/geometika.jpeg": require("@/assets/universities/geometika.jpeg"),
+  "/universities/iium.jpeg": require("@/assets/universities/iium.jpeg"),
+  "/universities/monash.jpeg": require("@/assets/universities/monash.jpeg"),
+  "/universities/ukm.jpeg": require("@/assets/universities/ukm.jpeg"),
+  "/universities/almadinah.jpeg": require("@/assets/universities/almadinah.jpeg"),
+  "/universities/britannia.jpeg": require("@/assets/universities/britannia.jpeg"),
+  "/universities/sheffield.jpeg": require("@/assets/universities/sheffield.jpeg"),
+  "/universities/ems.jpeg": require("@/assets/universities/ems.jpeg"),
+  "/universities/bright.jpeg": require("@/assets/universities/bright.jpeg"),
+  "/universities/bigben.jpeg": require("@/assets/universities/bigben.jpeg"),
+  "/universities/excel.jpeg": require("@/assets/universities/excel.jpeg"),
+  "/universities/erican.jpeg": require("@/assets/universities/erican.jpeg"),
+  "/universities/webster.jpeg": require("@/assets/universities/webster.jpeg"),
+  "/universities/studycircle.jpeg": require("@/assets/universities/studycircle.jpeg"),
+};
 
-function resolveImageUrl(imageUrl: string | null): string | null {
+function resolveImageSource(imageUrl: string | null) {
   if (!imageUrl) return null;
-  if (imageUrl.startsWith("http")) return imageUrl;
-  return `${BASE_URL}${imageUrl}`;
+  if (LOCAL_IMAGES[imageUrl]) return LOCAL_IMAGES[imageUrl];
+  if (imageUrl.startsWith("http")) return { uri: imageUrl };
+  return { uri: `${BASE_URL}${imageUrl}` };
 }
 
 export default function InstitutionsScreen() {
@@ -100,7 +128,15 @@ export default function InstitutionsScreen() {
               testID={`button-filter-${f}`}
             >
               <Text style={[styles.filterText, filter === f && styles.filterTextActive]}>
-                {t(`inst.${f === "all" ? "all" : f === "university" ? "universities" : "language_centers"}`)}
+                {t(
+                  `inst.${
+                    f === "all"
+                      ? "all"
+                      : f === "university"
+                      ? "universities"
+                      : "language_centers"
+                  }`
+                )}
               </Text>
             </TouchableOpacity>
           ))}
@@ -163,7 +199,7 @@ function InstitutionCard({
   onInquire: () => void;
   inquireLabel: string;
 }) {
-  const imgUrl = resolveImageUrl(item.imageUrl);
+  const imgSrc = resolveImageSource(item.imageUrl);
   const styles = StyleSheet.create({
     card: {
       backgroundColor: colors.card,
@@ -207,8 +243,8 @@ function InstitutionCard({
 
   return (
     <View style={styles.card}>
-      {imgUrl ? (
-        <Image source={{ uri: imgUrl }} style={styles.img} contentFit="cover" />
+      {imgSrc ? (
+        <Image source={imgSrc} style={styles.img} contentFit="cover" />
       ) : (
         <View style={[styles.img, { justifyContent: "center", alignItems: "center" }]}>
           <Feather name="image" size={32} color={colors.mutedForeground} />
@@ -216,8 +252,15 @@ function InstitutionCard({
       )}
       <View style={styles.body}>
         <Text style={styles.name}>{item.name}</Text>
-        <Text style={styles.desc} numberOfLines={2}>{item.description}</Text>
-        <TouchableOpacity style={styles.btn} onPress={onInquire} testID={`button-inquire-${item.id}`} activeOpacity={0.85}>
+        <Text style={styles.desc} numberOfLines={2}>
+          {item.description}
+        </Text>
+        <TouchableOpacity
+          style={styles.btn}
+          onPress={onInquire}
+          testID={`button-inquire-${item.id}`}
+          activeOpacity={0.85}
+        >
           <Feather name="message-circle" size={15} color="#fff" />
           <Text style={styles.btnText}>{inquireLabel}</Text>
         </TouchableOpacity>
@@ -257,7 +300,7 @@ function makeStyles(colors: ReturnType<typeof useColors>, isRTL: boolean) {
       fontSize: 24,
       color: "#fff",
       fontFamily: "Inter_700Bold",
-      marginBottom: 6,
+      marginBottom: 2,
     },
     headerSub: {
       fontSize: 14,
