@@ -85,69 +85,69 @@ async function seedDatabase() {
 
   const canonicalPackages = [
     {
-      nameAr: "باقة شهرين – خصم 20%",
-      nameEn: "2-Month Package – 20% Discount",
-      originalPrice: "6,300",
-      discountedPrice: "5,140",
-      savings: "1,160",
-      descriptionAr: "باقة مكثفة لشهرين مع خصم خاص",
-      descriptionEn: "Intensive 2-month package with a special discount",
+      nameAr: "باقة 3 أشهر",
+      nameEn: "3-Month Package",
+      originalPrice: "",
+      discountedPrice: "8,800",
+      savings: "",
+      descriptionAr: "باقة مكثفة لمدة 3 أشهر",
+      descriptionEn: "Intensive 3-month package",
       featuresAr: SHORT_FEATURES_AR,
       featuresEn: SHORT_FEATURES_EN,
     },
     {
-      nameAr: "شهرين + شهر مجاناً",
-      nameEn: "2 Months + 1 Month FREE",
-      originalPrice: "9,200",
-      discountedPrice: "6,300",
-      savings: "2,900",
-      descriptionAr: "ادرس 3 أشهر بسعر شهرين فقط!",
-      descriptionEn: "Study 3 Months for the Price of 2!",
+      nameAr: "باقة 4 أشهر",
+      nameEn: "4-Month Package",
+      originalPrice: "",
+      discountedPrice: "13,600",
+      savings: "",
+      descriptionAr: "باقة متوسطة لمدة 4 أشهر",
+      descriptionEn: "Intermediate 4-month package",
       featuresAr: SHORT_FEATURES_AR,
       featuresEn: SHORT_FEATURES_EN,
       isSpecial: "true",
     },
     {
-      nameAr: "باقة 6 أشهر – خصم 25%",
-      nameEn: "6-Month Package – 25% Discount",
-      originalPrice: "21,100",
-      discountedPrice: "16,750",
-      savings: "4,350",
+      nameAr: "باقة 6 أشهر",
+      nameEn: "6-Month Package",
+      originalPrice: "",
+      discountedPrice: "16,300",
+      savings: "",
       descriptionAr: "باقة شاملة لمدة 6 أشهر مع كافة الخدمات",
       descriptionEn: "Comprehensive 6-month package with all services",
       featuresAr: LONG_FEATURES_AR,
       featuresEn: LONG_FEATURES_EN,
     },
     {
-      nameAr: "باقة 8 أشهر – خصم 25%",
-      nameEn: "8-Month Package – 25% Discount",
-      originalPrice: "27,400",
-      discountedPrice: "21,600",
-      savings: "5,800",
+      nameAr: "باقة 8 أشهر",
+      nameEn: "8-Month Package",
+      originalPrice: "",
+      discountedPrice: "20,400",
+      savings: "",
       descriptionAr: "باقة طويلة الأمد لتعلم اللغة",
       descriptionEn: "Long-term language learning package",
       featuresAr: LONG_FEATURES_AR,
       featuresEn: LONG_FEATURES_EN,
     },
     {
-      nameAr: "باقة 10 أشهر – خصم 30%",
-      nameEn: "10-Month Package – 30% Discount",
-      originalPrice: "33,200",
-      discountedPrice: "24,500",
-      savings: "8,700",
+      nameAr: "باقة 10 أشهر",
+      nameEn: "10-Month Package",
+      originalPrice: "",
+      discountedPrice: "24,800",
+      savings: "",
       descriptionAr: "أفضل قيمة لتعلم اللغة بشكل متكامل",
       descriptionEn: "Best value for integrated language learning",
       featuresAr: LONG_FEATURES_AR,
       featuresEn: LONG_FEATURES_EN,
     },
     {
-      nameAr: "باقة 12 شهر – سجل 8 أشهر + 4 مجاناً",
-      nameEn: "12-Month Package – Enroll 8 Months + 4 FREE",
-      originalPrice: "41,100",
-      discountedPrice: "27,400",
-      savings: "13,700",
-      descriptionAr: "ادرس سنة كاملة بسعر 8 أشهر!",
-      descriptionEn: "Study 12 Months for the Price of 8!",
+      nameAr: "باقة سنة كاملة",
+      nameEn: "Full Year Package",
+      originalPrice: "",
+      discountedPrice: "28,500",
+      savings: "",
+      descriptionAr: "ادرس سنة كاملة واحصل على أفضل تجربة",
+      descriptionEn: "Study a full year for the best experience",
       featuresAr: LONG_FEATURES_AR,
       featuresEn: LONG_FEATURES_EN,
       isSpecial: "true",
@@ -160,11 +160,23 @@ async function seedDatabase() {
       await db.insert(packages).values(pkg);
     }
   } else {
-    for (let i = 0; i < existingPackages.length && i < canonicalPackages.length; i++) {
-      const existing = existingPackages[i];
+    const sortedExisting = [...existingPackages].sort((a, b) => a.id - b.id);
+    for (let i = 0; i < sortedExisting.length && i < canonicalPackages.length; i++) {
+      const existing = sortedExisting[i];
       const canonical = canonicalPackages[i];
       await db.update(packages)
-        .set({ featuresAr: canonical.featuresAr, featuresEn: canonical.featuresEn })
+        .set({
+          nameAr: canonical.nameAr,
+          nameEn: canonical.nameEn,
+          originalPrice: canonical.originalPrice,
+          discountedPrice: canonical.discountedPrice,
+          savings: canonical.savings,
+          descriptionAr: canonical.descriptionAr,
+          descriptionEn: canonical.descriptionEn,
+          featuresAr: canonical.featuresAr,
+          featuresEn: canonical.featuresEn,
+          isSpecial: canonical.isSpecial ?? null,
+        })
         .where(eq(packages.id, existing.id));
     }
   }
