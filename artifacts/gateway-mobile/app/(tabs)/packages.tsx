@@ -46,7 +46,7 @@ function formatPrice(price: string) {
 
 export default function PackagesScreen() {
   const colors = useColors();
-  const { t, language, isRTL } = useLanguage();
+  const { t, language, isRTL, setLanguage } = useLanguage();
   const insets = useSafeAreaInsets();
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
@@ -65,9 +65,22 @@ export default function PackagesScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { paddingTop: topPad + 16 }]}>
-        <Text style={[styles.headerTitle, { textAlign: isRTL ? "right" : "left" }]}>
-          {t("pkg.title")}
-        </Text>
+        <View style={[styles.headerTopRow, { flexDirection: isRTL ? "row-reverse" : "row" }]}>
+          <Text style={[styles.headerTitle, { textAlign: isRTL ? "right" : "left", flex: 1 }]}>
+            {t("pkg.title")}
+          </Text>
+          <TouchableOpacity
+            style={styles.langToggle}
+            onPress={() => {
+              Haptics.selectionAsync();
+              setLanguage(language === "ar" ? "en" : "ar");
+            }}
+            testID="button-language-toggle-pkg"
+            activeOpacity={0.8}
+          >
+            <Text style={styles.langToggleText}>{language === "ar" ? "EN" : "عر"}</Text>
+          </TouchableOpacity>
+        </View>
         <Text style={[styles.headerSub, { textAlign: isRTL ? "right" : "left" }]}>
           {t("pkg.subtitle")}
         </Text>
@@ -177,6 +190,25 @@ function makeStyles(colors: ReturnType<typeof useColors>, isRTL: boolean) {
       backgroundColor: colors.primary,
       paddingHorizontal: 20,
       paddingBottom: 24,
+    },
+    headerTopRow: {
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 4,
+      gap: 8,
+    },
+    langToggle: {
+      backgroundColor: "rgba(255,255,255,0.2)",
+      borderRadius: 16,
+      paddingHorizontal: 12,
+      paddingVertical: 5,
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.3)",
+    },
+    langToggleText: {
+      color: "#fff",
+      fontSize: 12,
+      fontFamily: "Inter_600SemiBold",
     },
     headerTitle: {
       fontSize: 24,

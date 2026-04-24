@@ -1,5 +1,6 @@
 import { Feather, MaterialIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { Linking, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -8,7 +9,6 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useColors } from "@/hooks/useColors";
 
 const WHATSAPP_SA = "966562022668";
-const WHATSAPP_MY = "601129082602";
 
 function openWhatsApp(phone: string, message: string) {
   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -26,7 +26,7 @@ const SERVICES = [
 
 export default function HomeScreen() {
   const colors = useColors();
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, language, setLanguage } = useLanguage();
   const insets = useSafeAreaInsets();
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
@@ -39,10 +39,31 @@ export default function HomeScreen() {
       contentContainerStyle={{ paddingBottom: Platform.OS === "web" ? 84 + 34 : 100 }}
       showsVerticalScrollIndicator={false}
     >
+      {/* Hero section — gradient uses primary (#1b294b) → foreground (#0d1829) from web CSS tokens */}
       <LinearGradient
-        colors={[colors.primary, "#2a4a7f"]}
-        style={[styles.hero, { paddingTop: topPad + 24 }]}
+        colors={[colors.primary, colors.foreground]}
+        style={[styles.hero, { paddingTop: topPad + 16 }]}
       >
+        {/* Language switcher + logo row */}
+        <View style={[styles.heroTopRow, { flexDirection: isRTL ? "row-reverse" : "row" }]}>
+          <Image
+            source={require("@/assets/images/logo.png")}
+            style={styles.logo}
+            contentFit="contain"
+          />
+          <TouchableOpacity
+            style={styles.langToggle}
+            onPress={() => {
+              Haptics.selectionAsync();
+              setLanguage(language === "ar" ? "en" : "ar");
+            }}
+            testID="button-language-toggle"
+            activeOpacity={0.8}
+          >
+            <Text style={styles.langToggleText}>{language === "ar" ? "EN" : "عر"}</Text>
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.badgeRow}>
           <View style={styles.badge}>
             <Text style={styles.badgeText}>{t("home.badge")}</Text>
@@ -55,8 +76,13 @@ export default function HomeScreen() {
           {t("home.subtitle")}
         </Text>
         <TouchableOpacity
-          style={styles.whatsappBtn}
-          onPress={() => openWhatsApp(WHATSAPP_SA, isRTL ? "مرحباً، أود الاستفسار عن خدماتكم" : "Hello, I'd like to inquire about your services")}
+          style={[styles.whatsappBtn, { alignSelf: isRTL ? "flex-end" : "flex-start" }]}
+          onPress={() =>
+            openWhatsApp(
+              WHATSAPP_SA,
+              isRTL ? "مرحباً، أود الاستفسار عن خدماتكم" : "Hello, I'd like to inquire about your services"
+            )
+          }
           testID="button-whatsapp-hero"
           activeOpacity={0.85}
         >
@@ -96,9 +122,32 @@ function makeStyles(colors: ReturnType<typeof useColors>, isRTL: boolean) {
       paddingHorizontal: 20,
       paddingBottom: 40,
     },
+    heroTopRow: {
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    logo: {
+      width: 52,
+      height: 52,
+      borderRadius: 10,
+    },
+    langToggle: {
+      backgroundColor: "rgba(255,255,255,0.2)",
+      borderRadius: 20,
+      paddingHorizontal: 14,
+      paddingVertical: 6,
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.3)",
+    },
+    langToggleText: {
+      color: "#fff",
+      fontSize: 13,
+      fontFamily: "Inter_600SemiBold",
+    },
     badgeRow: {
       flexDirection: isRTL ? "row-reverse" : "row",
-      marginBottom: 16,
+      marginBottom: 14,
     },
     badge: {
       backgroundColor: colors.gold,
@@ -112,27 +161,26 @@ function makeStyles(colors: ReturnType<typeof useColors>, isRTL: boolean) {
       fontFamily: "Inter_600SemiBold",
     },
     heroTitle: {
-      fontSize: 30,
+      fontSize: 28,
       color: "#fff",
       fontFamily: "Inter_700Bold",
       marginBottom: 12,
-      lineHeight: 38,
+      lineHeight: 36,
     },
     heroSubtitle: {
-      fontSize: 15,
+      fontSize: 14,
       color: "rgba(255,255,255,0.82)",
       fontFamily: "Inter_400Regular",
-      lineHeight: 24,
-      marginBottom: 28,
+      lineHeight: 22,
+      marginBottom: 24,
     },
     whatsappBtn: {
       flexDirection: "row",
       alignItems: "center",
       backgroundColor: colors.gold,
       borderRadius: 12,
-      paddingVertical: 14,
+      paddingVertical: 13,
       paddingHorizontal: 20,
-      alignSelf: isRTL ? "flex-end" : "flex-start",
       gap: 8,
     },
     whatsappBtnText: {

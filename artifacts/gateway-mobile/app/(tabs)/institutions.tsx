@@ -47,7 +47,7 @@ function resolveImageUrl(imageUrl: string | null): string | null {
 
 export default function InstitutionsScreen() {
   const colors = useColors();
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, language, setLanguage } = useLanguage();
   const insets = useSafeAreaInsets();
   const [filter, setFilter] = useState<"all" | "university" | "language_center">("all");
 
@@ -72,9 +72,22 @@ export default function InstitutionsScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { paddingTop: topPad + 16 }]}>
-        <Text style={[styles.headerTitle, { textAlign: isRTL ? "right" : "left" }]}>
-          {t("inst.title")}
-        </Text>
+        <View style={[styles.headerTopRow, { flexDirection: isRTL ? "row-reverse" : "row" }]}>
+          <Text style={[styles.headerTitle, { textAlign: isRTL ? "right" : "left", flex: 1 }]}>
+            {t("inst.title")}
+          </Text>
+          <TouchableOpacity
+            style={styles.langToggle}
+            onPress={() => {
+              Haptics.selectionAsync();
+              setLanguage(language === "ar" ? "en" : "ar");
+            }}
+            testID="button-language-toggle-inst"
+            activeOpacity={0.8}
+          >
+            <Text style={styles.langToggleText}>{language === "ar" ? "EN" : "عر"}</Text>
+          </TouchableOpacity>
+        </View>
         <Text style={[styles.headerSub, { textAlign: isRTL ? "right" : "left" }]}>
           {t("inst.subtitle")}
         </Text>
@@ -220,6 +233,25 @@ function makeStyles(colors: ReturnType<typeof useColors>, isRTL: boolean) {
       backgroundColor: colors.primary,
       paddingHorizontal: 20,
       paddingBottom: 20,
+    },
+    headerTopRow: {
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 4,
+      gap: 8,
+    },
+    langToggle: {
+      backgroundColor: "rgba(255,255,255,0.2)",
+      borderRadius: 16,
+      paddingHorizontal: 12,
+      paddingVertical: 5,
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.3)",
+    },
+    langToggleText: {
+      color: "#fff",
+      fontSize: 12,
+      fontFamily: "Inter_600SemiBold",
     },
     headerTitle: {
       fontSize: 24,
