@@ -47,7 +47,7 @@ export default function HomeScreen() {
         {/* Language switcher + logo row */}
         <View style={[styles.heroTopRow, { flexDirection: isRTL ? "row-reverse" : "row" }]}>
           <Image
-            source={require("@/assets/images/logo.png")}
+            source={require("@/assets/images/logo.jpeg")}
             style={styles.logo}
             contentFit="contain"
           />
