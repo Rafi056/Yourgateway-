@@ -1,134 +1,27 @@
-# Replit.md
+# Workspace
 
 ## Overview
 
-This is a bilingual (Arabic/English) education portal web application called "بوابتك إلى ماليزيا" (Your Gateway to Malaysia). It helps Arabic-speaking students find and apply to universities and language centers in Malaysia. The app features:
+pnpm workspace monorepo using TypeScript. Each package manages its own dependencies.
 
-- A browsable directory of Malaysian universities and language centers
-- Study package listings with pricing and discounts
-- An application submission system that also triggers WhatsApp notifications
-- A dashboard to view submitted applications
-- Full RTL/LTR language switching between Arabic and English
+## Stack
 
-The backend is an Express.js REST API with a PostgreSQL database (via Drizzle ORM). The frontend is a React SPA using Vite, with routing handled by Wouter.
+- **Monorepo tool**: pnpm workspaces
+- **Node.js version**: 24
+- **Package manager**: pnpm
+- **TypeScript version**: 5.9
+- **API framework**: Express 5
+- **Database**: PostgreSQL + Drizzle ORM
+- **Validation**: Zod (`zod/v4`), `drizzle-zod`
+- **API codegen**: Orval (from OpenAPI spec)
+- **Build**: esbuild (CJS bundle)
 
----
+## Key Commands
 
-## User Preferences
+- `pnpm run typecheck` — full typecheck across all packages
+- `pnpm run build` — typecheck + build all packages
+- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from OpenAPI spec
+- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
+- `pnpm --filter @workspace/api-server run dev` — run API server locally
 
-Preferred communication style: Simple, everyday language.
-
----
-
-## System Architecture
-
-### Frontend Architecture
-
-- **Framework**: React 18 with TypeScript, bundled via Vite
-- **Routing**: Wouter (lightweight, replaces React Router)
-- **State/Data Fetching**: TanStack React Query v5 for all server state; no global client state library
-- **UI Components**: shadcn/ui component library (Radix UI primitives + Tailwind CSS)
-- **Animations**: Framer Motion for page transitions and interactive animations
-- **Internationalization**: Custom `LanguageProvider` context (`client/src/lib/i18n.tsx`) that holds a flat translation map for both `ar` and `en`, switches `dir` attribute between `rtl` and `ltr`, and exposes a `t(key)` function
-- **Styling**: Tailwind CSS with custom CSS variables defining an "Oxford Blue + Gold" academic color palette; RTL layout is handled by toggling `dir` classes throughout components
-- **API Communication**: Custom hooks (`use-institutions.ts`, `use-applications.ts`) wrap React Query and call the shared route definitions from `@shared/routes`
-
-**Pages:**
-- `/` — Home (hero, services, pathways, CTA)
-- `/institutions` — Filterable list of universities, language centers, and packages
-- `/institutions/:id` — Institution detail + application form
-- `/dashboard` — View all submitted applications
-- `/announcements` — Public institute announcements feed
-- `/admin` — Admin login + announcement management panel
-
-### Backend Architecture
-
-- **Runtime**: Node.js with Express v5 (ESM modules, TypeScript via tsx)
-- **Entry point**: `server/index.ts` creates an HTTP server, registers routes, and serves static files in production
-- **Route registration**: `server/routes.ts` imports the shared `api` route definition object and wires up handlers; also seeds the database on first run
-- **Storage layer**: `server/storage.ts` defines an `IStorage` interface and a `DatabaseStorage` class that wraps Drizzle ORM queries — this makes the storage layer swappable
-- **Database access**: `server/db.ts` creates a `pg.Pool` and a Drizzle instance using `DATABASE_URL` from environment
-- **Build**: `script/build.ts` runs Vite for the client and esbuild for the server, bundling a specific allowlist of heavy dependencies to reduce cold-start time
-
-### Data Storage
-
-- **Database**: PostgreSQL (required; `DATABASE_URL` env var must be set)
-- **ORM**: Drizzle ORM with `drizzle-zod` for schema-derived Zod validation schemas
-- **Schema** (`shared/schema.ts`):
-  - `institutions` — id, name, type (`university` | `language_center`), description, location, imageUrl
-  - `packages` — id, nameAr, nameEn, originalPrice, discountedPrice, savings, descriptionAr, descriptionEn, featuresAr[], featuresEn[], isSpecial
-  - `applications` — id, studentName, studentEmail, institutionId (FK → institutions), desiredProgram, documents, status (default: `pending`), createdAt
-- **Migrations**: Drizzle Kit, output to `./migrations`, push via `npm run db:push`
-- **Seeding**: `server/routes.ts` seeds institutions and packages on startup if tables are empty
-
-### Shared Code
-
-The `shared/` directory is imported by both client and server:
-- `shared/schema.ts` — Drizzle table definitions + Zod insert schemas + TypeScript types
-- `shared/routes.ts` — Typed API route map (method, path, input schema, response schemas) + a `buildUrl` helper for path param interpolation
-
-This pattern ensures the frontend and backend agree on types and validation without code duplication.
-
-### Authentication
-
-- **Admin Authentication**: Institute admins authenticate via `express-session` (cookie-based, SESSION_SECRET env var). Login/logout endpoints at `/api/admin/login` and `/api/admin/logout`. Session data includes `adminUserId`. Cookies use `httpOnly`, `sameSite: lax`, and `secure` in production.
-- **Demo Admin Accounts**: Seeded on startup — `admin1`/`admin123` (Britannia Language Centre), `admin2`/`admin123` (Sheffield Academy).
-- **Student Auth**: Not implemented. The dashboard shows all applications globally.
-
-### Announcements System
-
-- **Inside Institution Pages**: Each institution's detail page (`/institutions/:id`) has a dedicated announcements section that is always visible (even when empty). It includes an embedded admin panel toggle ("Admin Access") where institution admins can log in, create, and delete announcements directly from the institution page. The admin panel verifies the admin belongs to that specific institution.
-- **Public Page** (`/announcements`): Displays all institute announcements as cards sorted by newest first. Shows title, content, institution name, admin name, date, and optional image. Bilingual AR/EN.
-- **Admin Panel** (`/admin`): Standalone admin login + announcement management panel (legacy, still accessible).
-- **API Routes**: `GET /api/announcements`, `GET /api/institutions/:id/announcements`, `POST /api/announcements` (auth, server enforces institution scoping), `DELETE /api/announcements/:id` (auth, own only), `GET /api/admin/announcements` (auth)
-- **DB Tables**: `admin_users` (username, passwordHash, institutionId FK, nameAr, nameEn), `announcements` (institutionId FK, adminUserId FK, titleAr, titleEn, contentAr, contentEn, imageUrl, createdAt)
-
-### SEO & Social Media
-
-- **Meta Tags**: Title, description, keywords set in `client/index.html` for Google indexing
-- **Open Graph + Twitter Cards**: OG tags for social media sharing preview (title, description, image)
-- **Sitemap**: Dynamic `sitemap.xml` served from `server/routes.ts` at `/sitemap.xml`
-- **robots.txt**: Static file in `client/public/robots.txt` allowing all crawlers
-- **Structured Data**: JSON-LD schema.org markup for EducationalOrganization
-- **Domain**: `gatewayservicess.com`
-
----
-
-## External Dependencies
-
-### Third-Party Services
-
-- **WhatsApp**: Application submissions trigger `window.open` calls to `wa.me` links for two phone numbers (`+601129082602`, `+966562022668`). This is the primary notification/communication channel.
-- **Payment Options**: Language package cards have a "Subscribe Now" button that opens a payment modal with 4 options (Tabby, Tamara, Bank Transfer, WhatsApp inquiry). All options currently redirect to WhatsApp with a pre-filled message containing the package name, price, and chosen payment method. Direct Tabby/Tamara API integration is pending API keys.
-- **Google Fonts**: DM Sans, Playfair Display, and other fonts loaded via `<link>` tags in `client/index.html`
-- **Unsplash**: Hero background image sourced from Unsplash CDN URL
-
-### npm Package Groups
-
-| Group | Packages |
-|---|---|
-| UI Primitives | All `@radix-ui/react-*` components |
-| Forms | `react-hook-form`, `@hookform/resolvers` |
-| Animation | `framer-motion` |
-| Data fetching | `@tanstack/react-query` |
-| Auth | `bcryptjs`, `express-session` |
-| Database | `drizzle-orm`, `drizzle-zod`, `pg`, `connect-pg-simple` |
-| Validation | `zod`, `zod-validation-error` |
-| Routing | `wouter` |
-| Date handling | `date-fns` |
-| Build tools | `vite`, `esbuild`, `tsx`, `tailwindcss`, `typescript` |
-
-### Environment Variables
-
-| Variable | Required | Purpose |
-|---|---|---|
-| `DATABASE_URL` | Yes | PostgreSQL connection string |
-| `SESSION_SECRET` | Yes | Secret key for express-session cookie signing |
-| `NODE_ENV` | No | Controls dev vs. production mode |
-| `REPL_ID` | No | Enables Replit-specific Vite plugins (cartographer, dev banner) |
-
-### Replit-Specific Plugins
-
-- `@replit/vite-plugin-runtime-error-modal` — always active
-- `@replit/vite-plugin-cartographer` — active in dev on Replit
-- `@replit/vite-plugin-dev-banner` — active in dev on Replit
+See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.
