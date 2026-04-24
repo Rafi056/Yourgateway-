@@ -1,0 +1,27 @@
+kind = "mobile"
+previewPath = "/gateway-mobile/"
+title = "Gateway Services Mobile"
+version = "1.0.0"
+id = "artifacts/gateway-mobile"
+router = "expo-domain"
+
+[[integratedSkills]]
+name = "expo"
+version = "1.0.0"
+
+[[services]]
+ensurePreviewReachable = "/status"
+name = "expo"
+paths = [ "/gateway-mobile/" ]
+localPort = 18602
+
+[services.development]
+run = "pnpm --filter @workspace/gateway-mobile run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/gateway-mobile", "run", "build" ]
+run = [ "pnpm", "--filter", "@workspace/gateway-mobile", "run", "serve" ]
+
+[services.env]
+PORT = "18602"
+BASE_PATH = "/gateway-mobile/"
