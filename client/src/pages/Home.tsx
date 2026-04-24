@@ -41,11 +41,12 @@ export default function Home() {
         </div>
 
         <div className="container mx-auto px-4 md:px-6 relative z-10">
-          <div className={`max-w-3xl ${dir === "rtl" ? "mr-auto" : "ml-auto"}`}>
+          <div className="max-w-3xl mx-auto">
             <motion.div
-              initial={{ opacity: 0, x: dir === "rtl" ? 20 : -20 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
+              className="flex flex-col items-center text-center"
             >
               <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/20 border border-secondary/30 text-secondary mb-6 backdrop-blur-sm ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
                 <Globe className="h-4 w-4" />
@@ -61,7 +62,7 @@ export default function Home() {
                 {t("home.hero_desc")}
               </p>
               
-              <div className={`flex flex-wrap gap-4 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+              <div className={`flex flex-wrap gap-4 justify-center ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
                 <a href="https://wa.me/966562022668" target="_blank" rel="noopener noreferrer">
                   <Button className="rounded-full px-8 py-6 text-lg font-bold bg-[#25D366] hover:bg-[#128C7E] border-none shadow-xl">
                     <MessageCircle className={`${dir === "rtl" ? "ml-2" : "mr-2"} h-6 w-6`} />
