@@ -319,22 +319,8 @@ export default function Home() {
           </p>
 
           {/* Payment method cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
+          <div className="grid grid-cols-2 gap-4 max-w-lg mx-auto">
             {[
-              {
-                label: language === 'ar' ? 'تابي' : 'Tabby',
-                sub: language === 'ar' ? '4 أقساط' : '4 installments',
-                color: 'border-[#3FCEA0]/40 hover:border-[#3FCEA0]',
-                icon: <span className="font-black text-[#3FCEA0] text-lg">tabby</span>,
-                msg: language === 'ar' ? 'أريد الدفع عبر تابي - 4 أقساط' : 'I want to pay via Tabby - 4 installments',
-              },
-              {
-                label: language === 'ar' ? 'تمارا' : 'Tamara',
-                sub: language === 'ar' ? '3 أقساط' : '3 installments',
-                color: 'border-[#F5A623]/40 hover:border-[#F5A623]',
-                icon: <span className="font-black text-[#F5A623] text-lg">tamara</span>,
-                msg: language === 'ar' ? 'أريد الدفع عبر تمارا - 3 أقساط' : 'I want to pay via Tamara - 3 installments',
-              },
               {
                 label: language === 'ar' ? 'تحويل بنكي' : 'Bank Transfer',
                 sub: 'IBAN: SA2645…1001',
