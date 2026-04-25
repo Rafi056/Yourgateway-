@@ -288,12 +288,12 @@ export default function Home() {
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-12">
             <h2 className="font-serif text-4xl font-bold mb-4">
-              {language === 'ar' ? 'طرق الدفع المتاحة' : 'Available Payment Methods'}
+              {language === 'ar' ? 'طرق الدفع' : 'Payment'}
             </h2>
             <p className="text-muted-foreground text-lg max-w-xl mx-auto">
               {language === 'ar'
-                ? 'اختر الطريقة الأنسب لك وتواصل معنا عبر الواتساب'
-                : 'Choose the most convenient option and contact us on WhatsApp'}
+                ? 'من أراد الدفع كاش أو حوالة بنكية يتواصل معنا مباشرةً عبر الواتساب'
+                : 'For cash or bank transfer payments, contact us directly on WhatsApp'}
             </p>
           </div>
 
@@ -318,43 +318,24 @@ export default function Home() {
               : '* Tuition fees are paid directly to the institute or university'}
           </p>
 
-          {/* Payment method cards */}
-          <div className="grid grid-cols-2 gap-4 max-w-lg mx-auto">
-            {[
-              {
-                label: language === 'ar' ? 'تحويل بنكي' : 'Bank Transfer',
-                sub: 'IBAN: SA2645…1001',
-                color: 'border-primary/30 hover:border-primary',
-                icon: <Banknote className="w-7 h-7 text-primary" />,
-                msg: language === 'ar' ? 'أريد الدفع عبر تحويل بنكي\nIBAN: SA2645000000262447881001' : 'I want to pay via Bank Transfer\nIBAN: SA2645000000262447881001',
-              },
-              {
-                label: language === 'ar' ? 'كاش' : 'Cash',
-                sub: language === 'ar' ? 'دفع مباشر للمعهد' : 'Direct to institute',
-                color: 'border-secondary/40 hover:border-secondary',
-                icon: <Banknote className="w-7 h-7 text-secondary-foreground" />,
-                msg: language === 'ar' ? 'أريد الدفع كاش مباشرةً للمعهد أو الجامعة' : 'I want to pay cash directly to the institute or university',
-              },
-            ].map((pm) => (
-              <motion.a
-                key={pm.label}
-                href={`https://wa.me/966562022668?text=${encodeURIComponent(pm.msg)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                className={`flex flex-col items-center justify-center gap-2 p-5 bg-card rounded-2xl border-2 transition-all duration-200 text-center cursor-pointer ${pm.color}`}
-                data-testid={`btn-payment-section-${pm.label}`}
-              >
-                {pm.icon}
-                <span className="font-bold text-sm">{pm.label}</span>
-                <span className="text-xs text-muted-foreground">{pm.sub}</span>
-                <span className={`flex items-center gap-1 text-[11px] text-[#25D366] font-semibold mt-1 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                  <MessageCircle className="w-3 h-3" />
-                  {language === 'ar' ? 'تواصل واتساب' : 'WhatsApp'}
-                </span>
-              </motion.a>
-            ))}
+          {/* WhatsApp CTA */}
+          <div className="flex justify-center">
+            <motion.a
+              href={`https://wa.me/966562022668?text=${encodeURIComponent(
+                language === 'ar'
+                  ? 'السلام عليكم، أريد الاستفسار عن طريقة الدفع (كاش أو حوالة بنكية)'
+                  : 'Hello, I would like to inquire about payment (cash or bank transfer)'
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              className={`inline-flex items-center gap-3 px-8 py-4 bg-[#25D366] text-white rounded-2xl font-bold text-lg shadow-lg transition-all duration-200 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
+              data-testid="btn-payment-whatsapp"
+            >
+              <MessageCircle className="w-6 h-6 flex-shrink-0" />
+              {language === 'ar' ? 'تواصل معنا على الواتساب' : 'Contact us on WhatsApp'}
+            </motion.a>
           </div>
         </div>
       </section>
