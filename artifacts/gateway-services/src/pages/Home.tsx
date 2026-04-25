@@ -395,7 +395,33 @@ export default function Home() {
                 )}
               </div>
 
-              <p className="text-sm font-semibold mb-4">
+              {/* Free included services */}
+              <div className={`mb-4 rounded-xl border border-green-200 bg-green-50 dark:bg-green-950/20 dark:border-green-900 p-3`}>
+                <p className={`text-xs font-bold text-green-700 dark:text-green-400 mb-2 flex items-center gap-1.5 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                  <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
+                  {language === 'ar' ? "مشمول مجاناً مع الباقة:" : "Included for free:"}
+                </p>
+                <div className={`grid grid-cols-2 gap-1 ${dir === "rtl" ? "text-right" : "text-left"}`}>
+                  {[
+                    language === 'ar' ? "الاستقبال من المطار" : "Airport Pickup",
+                    language === 'ar' ? "شريحة جوال" : "SIM Card",
+                    language === 'ar' ? "بطاقة مواصلات" : "Transport Card",
+                    language === 'ar' ? "ليلة في فندق" : "Hotel Night",
+                  ].map((item) => (
+                    <span key={item} className={`text-xs text-green-700 dark:text-green-400 flex items-center gap-1 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                      <span className="w-1 h-1 rounded-full bg-green-500 flex-shrink-0" />
+                      {item}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-[11px] text-green-600/80 dark:text-green-500/80 mt-2 font-medium">
+                  {language === 'ar'
+                    ? "* رسوم الدراسة تُدفع مباشرةً للمعهد أو الجامعة"
+                    : "* Tuition fees are paid directly to the institute or university"}
+                </p>
+              </div>
+
+              <p className="text-sm font-semibold mb-3">
                 {language === 'ar' ? "اختر طريقة الدفع:" : "Choose payment method:"}
               </p>
 
@@ -491,6 +517,32 @@ export default function Home() {
                     </Button>
                   </a>
                 </div>
+
+                {/* Cash */}
+                <a
+                  href={`https://wa.me/966562022668?text=${encodeURIComponent(
+                    language === 'ar'
+                      ? `أريد الاشتراك في ${selectedPkg.nameAr}\nالسعر: MYR ${selectedPkg.discountedPrice}\nطريقة الدفع: كاش (دفع مباشر للمعهد/الجامعة)`
+                      : `I want to subscribe to ${selectedPkg.nameEn}\nPrice: MYR ${selectedPkg.discountedPrice}\nPayment: Cash (direct to institute/university)`
+                  )}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="block" data-testid="btn-pay-cash-home"
+                >
+                  <Button variant="outline" className={`w-full py-5 text-base font-bold justify-between border-2 hover:border-secondary hover:bg-secondary/5 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                    <div className={`flex items-center gap-3 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                      <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center">
+                        <Banknote className="w-5 h-5 text-secondary-foreground" />
+                      </div>
+                      <div className={dir === "rtl" ? "text-right" : "text-left"}>
+                        <span className="block font-bold">{language === 'ar' ? "كاش" : "Cash"}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {language === 'ar' ? "دفع مباشر للمعهد أو الجامعة" : "Pay directly to institute / university"}
+                        </span>
+                      </div>
+                    </div>
+                    <ArrowLeft className={`w-4 h-4 ${dir === "rtl" ? "" : "rotate-180"}`} />
+                  </Button>
+                </a>
 
                 {/* WhatsApp - Inquiry ONLY */}
                 <div className="border-t border-border pt-3">
