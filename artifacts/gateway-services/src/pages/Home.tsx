@@ -283,6 +283,96 @@ export default function Home() {
         </div>
       </section>
 
+      {/* PAYMENT METHODS SECTION */}
+      <section className="py-20 bg-muted/30">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="text-center mb-12">
+            <h2 className="font-serif text-4xl font-bold mb-4">
+              {language === 'ar' ? 'طرق الدفع المتاحة' : 'Available Payment Methods'}
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+              {language === 'ar'
+                ? 'اختر الطريقة الأنسب لك وتواصل معنا عبر الواتساب'
+                : 'Choose the most convenient option and contact us on WhatsApp'}
+            </p>
+          </div>
+
+          {/* Free services banner */}
+          <div className={`flex flex-wrap justify-center gap-3 mb-10`}>
+            {[
+              { label: language === 'ar' ? 'استقبال من المطار' : 'Airport Pickup' },
+              { label: language === 'ar' ? 'شريحة جوال' : 'SIM Card' },
+              { label: language === 'ar' ? 'بطاقة مواصلات' : 'Transport Card' },
+              { label: language === 'ar' ? 'ليلة في فندق' : 'Hotel Night' },
+            ].map((s) => (
+              <span key={s.label} className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-green-100 dark:bg-green-950/40 text-green-700 dark:text-green-400 text-sm font-semibold border border-green-200 dark:border-green-800 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+                <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                {s.label}
+                <span className="font-bold text-green-600">— {language === 'ar' ? 'مجاناً' : 'FREE'}</span>
+              </span>
+            ))}
+          </div>
+          <p className="text-center text-sm text-muted-foreground mb-10">
+            {language === 'ar'
+              ? '* رسوم الدراسة تُدفع مباشرةً للمعهد أو الجامعة'
+              : '* Tuition fees are paid directly to the institute or university'}
+          </p>
+
+          {/* Payment method cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
+            {[
+              {
+                label: language === 'ar' ? 'تابي' : 'Tabby',
+                sub: language === 'ar' ? '4 أقساط' : '4 installments',
+                color: 'border-[#3FCEA0]/40 hover:border-[#3FCEA0]',
+                icon: <span className="font-black text-[#3FCEA0] text-lg">tabby</span>,
+                msg: language === 'ar' ? 'أريد الدفع عبر تابي - 4 أقساط' : 'I want to pay via Tabby - 4 installments',
+              },
+              {
+                label: language === 'ar' ? 'تمارا' : 'Tamara',
+                sub: language === 'ar' ? '3 أقساط' : '3 installments',
+                color: 'border-[#F5A623]/40 hover:border-[#F5A623]',
+                icon: <span className="font-black text-[#F5A623] text-lg">tamara</span>,
+                msg: language === 'ar' ? 'أريد الدفع عبر تمارا - 3 أقساط' : 'I want to pay via Tamara - 3 installments',
+              },
+              {
+                label: language === 'ar' ? 'تحويل بنكي' : 'Bank Transfer',
+                sub: 'IBAN: SA2645…1001',
+                color: 'border-primary/30 hover:border-primary',
+                icon: <Banknote className="w-7 h-7 text-primary" />,
+                msg: language === 'ar' ? 'أريد الدفع عبر تحويل بنكي\nIBAN: SA2645000000262447881001' : 'I want to pay via Bank Transfer\nIBAN: SA2645000000262447881001',
+              },
+              {
+                label: language === 'ar' ? 'كاش' : 'Cash',
+                sub: language === 'ar' ? 'دفع مباشر للمعهد' : 'Direct to institute',
+                color: 'border-secondary/40 hover:border-secondary',
+                icon: <Banknote className="w-7 h-7 text-secondary-foreground" />,
+                msg: language === 'ar' ? 'أريد الدفع كاش مباشرةً للمعهد أو الجامعة' : 'I want to pay cash directly to the institute or university',
+              },
+            ].map((pm) => (
+              <motion.a
+                key={pm.label}
+                href={`https://wa.me/966562022668?text=${encodeURIComponent(pm.msg)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                className={`flex flex-col items-center justify-center gap-2 p-5 bg-card rounded-2xl border-2 transition-all duration-200 text-center cursor-pointer ${pm.color}`}
+                data-testid={`btn-payment-section-${pm.label}`}
+              >
+                {pm.icon}
+                <span className="font-bold text-sm">{pm.label}</span>
+                <span className="text-xs text-muted-foreground">{pm.sub}</span>
+                <span className={`flex items-center gap-1 text-[11px] text-[#25D366] font-semibold mt-1 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+                  <MessageCircle className="w-3 h-3" />
+                  {language === 'ar' ? 'تواصل واتساب' : 'WhatsApp'}
+                </span>
+              </motion.a>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CONTACT SECTION */}
       <section className="py-20 bg-primary text-white text-center">
         <div className="container mx-auto px-4 md:px-6">
