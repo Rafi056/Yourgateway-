@@ -16,9 +16,9 @@ const SOCIAL_LINKS = {
 };
 
 const IMPORTANT_LINKS_AR = [
-  { label: "الجامعات", href: "/institutions?type=university" },
+  { label: "الشكاوي والاقتراحات", href: `https://wa.me/966562022668?text=${encodeURIComponent("السلام عليكم، لدي شكوى أو اقتراح أود مشاركته:")}` },
   { label: "الشروط والأحكام", href: "/terms" },
-  { label: "معاهد اللغة", href: "/institutions?type=language_center" },
+  { label: "سؤال وجواب", href: `https://wa.me/966562022668?text=${encodeURIComponent("السلام عليكم، لدي سؤال أود الاستفسار عنه:")}` },
   { label: "سياسة الاسترجاع", href: "/terms#refund" },
   { label: "باقاتنا", href: "/#packages" },
   { label: "سياسة الخصوصية", href: "/terms#privacy" },
@@ -27,9 +27,9 @@ const IMPORTANT_LINKS_AR = [
 ];
 
 const IMPORTANT_LINKS_EN = [
-  { label: "Universities", href: "/institutions?type=university" },
+  { label: "Complaints & Suggestions", href: `https://wa.me/966562022668?text=${encodeURIComponent("Hello, I have a complaint or suggestion I'd like to share:")}` },
   { label: "Terms & Conditions", href: "/terms" },
-  { label: "Language Centers", href: "/institutions?type=language_center" },
+  { label: "FAQ", href: `https://wa.me/966562022668?text=${encodeURIComponent("Hello, I have a question I'd like to ask:")}` },
   { label: "Refund Policy", href: "/terms#refund" },
   { label: "Our Packages", href: "/#packages" },
   { label: "Privacy Policy", href: "/terms#privacy" },
