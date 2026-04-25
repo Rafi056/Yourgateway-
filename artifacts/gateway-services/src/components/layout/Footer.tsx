@@ -8,7 +8,7 @@ const SOCIAL_LINKS = {
   whatsapp_my: "https://wa.me/601129082602",
   email: "mailto:hlohlo05056@gmail.com",
   instagram: "https://www.instagram.com/gmalay77?igsh=dncyN2w0b29sNXZ5",
-  tiktok: "#",
+  tiktok: "https://www.tiktok.com/@gmalay77",
   snapchat: "https://snapchat.com/t/XqVGyeHu",
   x: "https://x.com/gmalay777",
   facebook: "https://www.facebook.com/share/p/18hKQ9AyMZ/",
