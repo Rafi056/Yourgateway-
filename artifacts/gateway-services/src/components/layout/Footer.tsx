@@ -6,13 +6,13 @@ import { useLanguage } from "@/lib/i18n";
 const SOCIAL_LINKS = {
   whatsapp_sa: "https://wa.me/966562022668",
   whatsapp_my: "https://wa.me/601129082602",
-  email: "#",
-  instagram: "https://direct.me/gatemalay",
+  email: "mailto:hlohlo05056@gmail.com",
+  instagram: "https://www.instagram.com/gmalay77?igsh=dncyN2w0b29sNXZ5",
   tiktok: "#",
-  snapchat: "#",
-  x: "#",
-  facebook: "#",
-  youtube: "#",
+  snapchat: "https://snapchat.com/t/XqVGyeHu",
+  x: "https://x.com/gmalay777",
+  facebook: "https://www.facebook.com/share/p/18hKQ9AyMZ/",
+  youtube: "https://youtube.com/channel/UCRybLhK6y_C_hGaWFdVEqxA",
 };
 
 const IMPORTANT_LINKS_AR = [

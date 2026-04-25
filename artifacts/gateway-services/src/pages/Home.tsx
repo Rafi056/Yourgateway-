@@ -453,28 +453,48 @@ export default function Home() {
                 </a>
 
                 {/* Bank Transfer */}
-                <a
-                  href={`https://wa.me/966562022668?text=${encodeURIComponent(
-                    language === 'ar'
-                      ? `أريد الاشتراك في ${selectedPkg.nameAr}\nالسعر: MYR ${selectedPkg.discountedPrice}\nطريقة الدفع: تحويل بنكي`
-                      : `I want to subscribe to ${selectedPkg.nameEn}\nPrice: MYR ${selectedPkg.discountedPrice}\nPayment: Bank Transfer`
-                  )}`}
-                  target="_blank" rel="noopener noreferrer"
-                  className="block" data-testid="btn-pay-bank-home"
+                <div
+                  className={`border-2 border-border rounded-xl p-4 bg-muted/30 ${dir === "rtl" ? "text-right" : "text-left"}`}
+                  data-testid="btn-pay-bank-home"
                 >
-                  <Button variant="outline" className={`w-full py-5 text-base font-bold justify-between border-2 hover:border-primary hover:bg-primary/5 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
-                    <div className={`flex items-center gap-3 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
-                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                        <Banknote className="w-5 h-5 text-primary" />
-                      </div>
-                      <div className={dir === "rtl" ? "text-right" : "text-left"}>
-                        <span className="block font-bold">{language === 'ar' ? "تحويل بنكي" : "Bank Transfer"}</span>
-                        <span className="text-xs text-muted-foreground">{language === 'ar' ? "دفعة واحدة كاملة" : "Full payment"}</span>
-                      </div>
+                  <div className={`flex items-center gap-3 mb-3 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <Banknote className="w-5 h-5 text-primary" />
                     </div>
-                    <ArrowLeft className={`w-4 h-4 ${dir === "rtl" ? "" : "rotate-180"}`} />
-                  </Button>
-                </a>
+                    <div>
+                      <span className="block font-bold text-sm">{language === 'ar' ? "تحويل بنكي" : "Bank Transfer"}</span>
+                      <span className="text-xs text-muted-foreground">{language === 'ar' ? "دفعة واحدة كاملة" : "Full payment"}</span>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5 text-xs bg-card rounded-lg p-3 border border-border font-mono">
+                    <div className={`flex justify-between gap-2 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                      <span className="text-muted-foreground font-sans">{language === 'ar' ? "الاسم" : "Name"}</span>
+                      <span className="font-semibold font-sans">Samer Almarzuqi</span>
+                    </div>
+                    <div className={`flex justify-between gap-2 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                      <span className="text-muted-foreground font-sans">IBAN</span>
+                      <span className="font-bold tracking-wider text-[11px]">SA2645000000262447881001</span>
+                    </div>
+                    <div className={`flex justify-between gap-2 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                      <span className="text-muted-foreground font-sans">{language === 'ar' ? "رقم الحساب" : "Account No."}</span>
+                      <span>262-447881-001</span>
+                    </div>
+                  </div>
+                  <a
+                    href={`https://wa.me/966562022668?text=${encodeURIComponent(
+                      language === 'ar'
+                        ? `أريد الاشتراك في ${selectedPkg.nameAr}\nالسعر: MYR ${selectedPkg.discountedPrice}\nطريقة الدفع: تحويل بنكي\nIBAN: SA2645000000262447881001`
+                        : `I want to subscribe to ${selectedPkg.nameEn}\nPrice: MYR ${selectedPkg.discountedPrice}\nPayment: Bank Transfer\nIBAN: SA2645000000262447881001`
+                    )}`}
+                    target="_blank" rel="noopener noreferrer"
+                    className="block mt-3"
+                  >
+                    <Button size="sm" variant="outline" className={`w-full text-xs font-bold ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                      <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" />
+                      {language === 'ar' ? "أبلغنا بعد التحويل" : "Notify us after transfer"}
+                    </Button>
+                  </a>
+                </div>
 
                 {/* WhatsApp - Inquiry ONLY */}
                 <div className="border-t border-border pt-3">
