@@ -14,7 +14,7 @@ import {
   type Announcement,
   type InsertAnnouncement,
 } from "@workspace/db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, asc } from "drizzle-orm";
 
 export interface IStorage {
   getInstitutions(type?: string): Promise<Institution[]>;
@@ -72,7 +72,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPackages(): Promise<any[]> {
-    return await db.select().from(packages);
+    return await db.select().from(packages).orderBy(asc(packages.id));
   }
 
   async getAdminByUsername(username: string): Promise<AdminUser | undefined> {

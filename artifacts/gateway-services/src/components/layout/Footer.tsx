@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { MessageCircle, Mail } from "lucide-react";
-import { SiFacebook, SiYoutube, SiTiktok, SiSnapchat, SiX, SiInstagram } from "react-icons/si";
+import { SiFacebook, SiYoutube, SiTiktok, SiSnapchat, SiX, SiInstagram, SiVisa, SiMastercard, SiApplepay } from "react-icons/si";
 import { useLanguage } from "@/lib/i18n";
 
 const SOCIAL_LINKS = {
@@ -37,14 +37,6 @@ const IMPORTANT_LINKS_EN = [
   { label: "Contact Us", href: "https://wa.me/966562022668" },
 ];
 
-const PAYMENT_METHODS = [
-  { label: "tabby", color: "#3FCEA0", textColor: "#fff" },
-  { label: "tamara", color: "#F5A623", textColor: "#fff" },
-  { label: "Apple Pay", color: "#000", textColor: "#fff" },
-  { label: "Visa", color: "#1A1F71", textColor: "#fff" },
-  { label: "Mastercard", color: "#EB001B", textColor: "#fff" },
-  { label: "مدى", color: "#1B4F9B", textColor: "#fff" },
-];
 
 export function Footer() {
   const { t, dir, language } = useLanguage();
@@ -167,16 +159,31 @@ export function Footer() {
         </div>
 
         {/* ── Payment Methods ── */}
-        <div className="flex flex-wrap gap-2 justify-center">
-          {PAYMENT_METHODS.map((pm) => (
-            <span
-              key={pm.label}
-              className="px-3 py-1.5 rounded-md text-xs font-bold tracking-wide"
-              style={{ backgroundColor: pm.color, color: pm.textColor }}
-            >
-              {pm.label}
-            </span>
-          ))}
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          {/* Tabby */}
+          <div className="h-9 px-4 rounded-md bg-[#3FCEA0] flex items-center justify-center">
+            <span className="text-white font-black text-sm tracking-widest">tabby</span>
+          </div>
+          {/* Tamara */}
+          <div className="h-9 px-4 rounded-md bg-white flex items-center justify-center border border-white/20">
+            <span className="text-[#282828] font-black text-sm tracking-wider">tamara</span>
+          </div>
+          {/* Apple Pay */}
+          <div className="h-9 px-4 rounded-md bg-white flex items-center justify-center gap-1.5">
+            <SiApplepay className="text-black text-2xl" />
+          </div>
+          {/* Visa */}
+          <div className="h-9 px-4 rounded-md bg-white flex items-center justify-center">
+            <SiVisa className="text-[#1A1F71] text-3xl" />
+          </div>
+          {/* Mastercard */}
+          <div className="h-9 px-4 rounded-md bg-white flex items-center justify-center">
+            <SiMastercard className="text-[#EB001B] text-2xl" />
+          </div>
+          {/* Mada */}
+          <div className="h-9 px-4 rounded-md bg-[#1B4F9B] flex items-center justify-center">
+            <span className="text-white font-black text-sm tracking-widest">mada</span>
+          </div>
         </div>
 
       </div>
