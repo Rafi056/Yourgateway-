@@ -77,10 +77,12 @@ async function seedDatabase() {
     }
   }
 
-  const SHORT_FEATURES_AR = ["رسوم الدراسة", "رسوم التسجيل", "استقبال من المطار مع شرحة جوال وبطاقة مواصلات", "سكن يوم في فندق", "اختبار تحديد المستوى", "شهادة إتمام"];
-  const SHORT_FEATURES_EN = ["Tuition Fees", "Registration Fees", "Airport Pickup with SIM Card & Transit Card", "One Hotel Night", "Placement Test", "Certificate of Completion"];
-  const LONG_FEATURES_AR = ["رسوم الدراسة", "فيزا الطالب", "التأمين الطبي", "رسوم التسجيل", "استقبال من المطار مع شرحة جوال وبطاقة مواصلات", "سكن يوم في فندق", "الفحص الطبي", "اختبار تحديد المستوى", "شهادة إتمام"];
-  const LONG_FEATURES_EN = ["Tuition Fees", "Student Visa", "Medical Insurance", "Registration Fees", "Airport Pickup with SIM Card & Transit Card", "One Hotel Night", "Medical Check-up", "Placement Test", "Certificate of Completion"];
+  const SHORT_FEATURES_AR = ["رسوم الدراسة", "رسوم التسجيل", "استقبال من المطار مع شرحة جوال وبطاقة مواصلات", "اختبار تحديد المستوى", "شهادة إتمام"];
+  const SHORT_FEATURES_EN = ["Tuition Fees", "Registration Fees", "Airport Pickup with SIM Card & Transit Card", "Placement Test", "Certificate of Completion"];
+  const MID_FEATURES_AR = ["رسوم الدراسة", "فيزا الطالب", "الفحص الطبي", "رسوم التسجيل", "استقبال من المطار مع شرحة جوال وبطاقة مواصلات", "اختبار تحديد المستوى", "شهادة إتمام"];
+  const MID_FEATURES_EN = ["Tuition Fees", "Student Visa", "Medical Check-up", "Registration Fees", "Airport Pickup with SIM Card & Transit Card", "Placement Test", "Certificate of Completion"];
+  const LONG_FEATURES_AR = ["رسوم الدراسة", "فيزا الطالب", "التأمين الطبي", "رسوم التسجيل", "استقبال من المطار مع شرحة جوال وبطاقة مواصلات", "الفحص الطبي", "اختبار تحديد المستوى", "شهادة إتمام"];
+  const LONG_FEATURES_EN = ["Tuition Fees", "Student Visa", "Medical Insurance", "Registration Fees", "Airport Pickup with SIM Card & Transit Card", "Medical Check-up", "Placement Test", "Certificate of Completion"];
 
   const canonicalPackages = [
     {
@@ -102,8 +104,8 @@ async function seedDatabase() {
       savings: "",
       descriptionAr: "باقة متوسطة لمدة 4 أشهر",
       descriptionEn: "Intermediate 4-month package",
-      featuresAr: SHORT_FEATURES_AR,
-      featuresEn: SHORT_FEATURES_EN,
+      featuresAr: MID_FEATURES_AR,
+      featuresEn: MID_FEATURES_EN,
       isSpecial: "true",
     },
     {

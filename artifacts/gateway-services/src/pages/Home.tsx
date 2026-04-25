@@ -303,7 +303,6 @@ export default function Home() {
               { label: language === 'ar' ? 'استقبال من المطار' : 'Airport Pickup' },
               { label: language === 'ar' ? 'شريحة جوال' : 'SIM Card' },
               { label: language === 'ar' ? 'بطاقة مواصلات' : 'Transport Card' },
-              { label: language === 'ar' ? 'ليلة في فندق' : 'Hotel Night' },
             ].map((s) => (
               <span key={s.label} className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-green-100 dark:bg-green-950/40 text-green-700 dark:text-green-400 text-sm font-semibold border border-green-200 dark:border-green-800 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
                 <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
@@ -336,30 +335,6 @@ export default function Home() {
               <MessageCircle className="w-6 h-6 flex-shrink-0" />
               {language === 'ar' ? 'تواصل معنا على الواتساب' : 'Contact us on WhatsApp'}
             </motion.a>
-          </div>
-        </div>
-      </section>
-
-      {/* CONTACT SECTION */}
-      <section className="py-20 bg-primary text-white text-center">
-        <div className="container mx-auto px-4 md:px-6">
-          <h2 className="text-4xl font-bold mb-8 font-serif">{t("home.contact_title")}</h2>
-          <div className="flex flex-col items-center gap-6">
-            <div className={`flex items-center gap-4 text-2xl font-bold ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
-              <Phone className="h-8 w-8 text-secondary" />
-              <div className="flex flex-col gap-1">
-                <span>+60 11-2908 2602</span>
-                <span>+966 56 202 2668</span>
-              </div>
-            </div>
-            <div className="flex gap-6 mt-8">
-              <a href="https://wa.me/966562022668" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform">
-                <MessageCircle className="h-10 w-10 text-secondary" />
-              </a>
-              <a href="https://direct.me/gatemalay" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform">
-                <Instagram className="h-10 w-10 text-secondary" />
-              </a>
-            </div>
           </div>
         </div>
       </section>
@@ -463,7 +438,6 @@ export default function Home() {
                     language === 'ar' ? "الاستقبال من المطار" : "Airport Pickup",
                     language === 'ar' ? "شريحة جوال" : "SIM Card",
                     language === 'ar' ? "بطاقة مواصلات" : "Transport Card",
-                    language === 'ar' ? "ليلة في فندق" : "Hotel Night",
                   ].map((item) => (
                     <span key={item} className={`text-xs text-green-700 dark:text-green-400 flex items-center gap-1 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
                       <span className="w-1 h-1 rounded-full bg-green-500 flex-shrink-0" />
