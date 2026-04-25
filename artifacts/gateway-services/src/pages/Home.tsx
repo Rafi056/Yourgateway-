@@ -307,6 +307,58 @@ export default function Home() {
         </div>
       </section>
 
+      {/* CLOSING BRAND CTA */}
+      <section className="py-24 bg-background border-t border-border text-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-muted/30 to-transparent pointer-events-none" />
+        <div className="container mx-auto px-4 md:px-6 relative z-10 max-w-3xl">
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-8 font-medium"
+          >
+            {language === "ar"
+              ? "نحن نؤمن أن كل طالب يستحق مستقبلاً مشرقاً،\nصُمِّمت بوابتك إلى ماليزيا لتكون رفيقك من أولى خطواتك حتى يوم تخرجك."
+              : "We believe every student deserves a bright future.\nGateway Services Malaysia was designed to be your companion from your first step to graduation day."}
+          </motion.p>
+          <motion.h2
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="font-serif text-5xl md:text-7xl font-black text-primary mb-10 leading-tight"
+          >
+            {language === "ar" ? "بوابتك إلى ماليزيا" : "Gateway to Malaysia"}
+          </motion.h2>
+
+          {/* CR Number + Saudi emblem */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.25 }}
+            className={`inline-flex items-center gap-6 border border-border rounded-2xl px-8 py-4 bg-card ${dir === "rtl" ? "flex-row-reverse" : ""}`}
+          >
+            <div className="w-12 h-12 flex-shrink-0 rounded-full bg-[#006C35] border-2 border-[#006C35] flex items-center justify-center overflow-hidden">
+              <svg viewBox="0 0 60 60" className="w-10 h-10" fill="white">
+                {/* Stylised palm tree */}
+                <rect x="28" y="30" width="4" height="22" rx="2"/>
+                <ellipse cx="30" cy="28" rx="12" ry="8"/>
+                <path d="M18 20 Q30 10 42 20" fill="white"/>
+                <path d="M14 24 Q30 12 46 24" fill="white" opacity="0.7"/>
+                {/* Sword */}
+                <rect x="29" y="52" width="2" height="6" rx="1"/>
+                <path d="M20 54 L40 54 L30 52 Z" fill="white"/>
+              </svg>
+            </div>
+            <div className={dir === "rtl" ? "text-right" : "text-left"}>
+              <p className="text-xs text-muted-foreground mb-1">
+                {language === "ar" ? "السجل التجاري" : "Commercial Registration"}
+              </p>
+              <p className="font-mono text-xl font-bold text-foreground tracking-wider">7050249676</p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* PAYMENT MODAL */}
       <AnimatePresence>
         {selectedPkg && (
