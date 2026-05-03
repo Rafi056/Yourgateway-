@@ -512,8 +512,8 @@ ${allPages
       const tamaraData = await tamaraRes.json() as any;
 
       if (!tamaraRes.ok) {
-        req.log?.error({ tamaraData }, "Tamara checkout failed");
-        return res.status(400).json({ message: tamaraData.message || "Tamara error", details: tamaraData });
+        req.log?.error({ tamaraData, status: tamaraRes.status, payload }, "Tamara checkout failed");
+        return res.status(400).json({ message: tamaraData.message || "Tamara error", details: tamaraData, status: tamaraRes.status });
       }
 
       res.json({ checkout_url: tamaraData.checkout_url, order_id: orderId });
