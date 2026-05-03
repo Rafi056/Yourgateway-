@@ -427,6 +427,107 @@ ${allPages
     }
   });
 
+  // ── Tamara: Create Checkout Session ──
+  app.post("/api/payments/tamara/checkout", async (req, res) => {
+    try {
+      const { packageName, packagePrice, customerName, customerPhone, customerEmail, language } = req.body;
+
+      const TAMARA_API_URL = "https://api-sandbox.tamara.co";
+      const TAMARA_API_TOKEN = process.env.TAMARA_API_TOKEN;
+
+      if (!TAMARA_API_TOKEN) {
+        return res.status(500).json({ message: "Tamara not configured" });
+      }
+
+      // Convert MYR price string to number
+      const priceNum = parseFloat(String(packagePrice).replace(/,/g, ""));
+      // Tamara works in SAR, convert MYR → SAR (approx 0.80)
+      const sarAmount = Math.round(priceNum * 0.80 * 100) / 100;
+
+      const orderId = `GW-${Date.now()}`;
+      const baseUrl = process.env.REPLIT_DOMAINS
+        ? `https://${process.env.REPLIT_DOMAINS.split(",")[0]}`
+        : "http://localhost:80";
+
+      const payload = {
+        order_reference_id: orderId,
+        order_number: orderId,
+        locale: language === "ar" ? "ar_SA" : "en_US",
+        currency: "SAR",
+        total_amount: { amount: sarAmount.toFixed(2), currency: "SAR" },
+        description: packageName,
+        country_code: "SA",
+        payment_type: "PAY_BY_INSTALMENTS",
+        instalments: 3,
+        items: [
+          {
+            reference_id: orderId,
+            type: "Digital",
+            name: packageName,
+            sku: orderId,
+            quantity: 1,
+            total_amount: { amount: sarAmount.toFixed(2), currency: "SAR" },
+            unit_price: { amount: sarAmount.toFixed(2), currency: "SAR" },
+            discount_amount: { amount: "0.00", currency: "SAR" },
+            tax_amount: { amount: "0.00", currency: "SAR" },
+          },
+        ],
+        consumer: {
+          first_name: customerName || "Customer",
+          last_name: "",
+          phone_number: customerPhone || "",
+          email: customerEmail || "customer@example.com",
+        },
+        billing_address: {
+          first_name: customerName || "Customer",
+          last_name: "",
+          phone_number: customerPhone || "",
+          address_line1: "Saudi Arabia",
+          country_code: "SA",
+        },
+        shipping_address: {
+          first_name: customerName || "Customer",
+          last_name: "",
+          phone_number: customerPhone || "",
+          address_line1: "Saudi Arabia",
+          country_code: "SA",
+        },
+        merchant_url: {
+          success: `${baseUrl}/?payment=success&order=${orderId}`,
+          failure: `${baseUrl}/?payment=failed&order=${orderId}`,
+          cancel: `${baseUrl}/?payment=cancelled&order=${orderId}`,
+          notification: `${baseUrl}/api/payments/tamara/webhook`,
+        },
+      };
+
+      const tamaraRes = await fetch(`${TAMARA_API_URL}/checkout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TAMARA_API_TOKEN}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const tamaraData = await tamaraRes.json() as any;
+
+      if (!tamaraRes.ok) {
+        req.log?.error({ tamaraData }, "Tamara checkout failed");
+        return res.status(400).json({ message: tamaraData.message || "Tamara error", details: tamaraData });
+      }
+
+      res.json({ checkout_url: tamaraData.checkout_url, order_id: orderId });
+    } catch (err) {
+      req.log?.error({ err }, "Tamara checkout error");
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ── Tamara: Webhook ──
+  app.post("/api/payments/tamara/webhook", (req, res) => {
+    res.json({ received: true });
+  });
+
   app.post("/api/announcements", async (req, res) => {
     try {
       if (!req.session.adminUserId) {

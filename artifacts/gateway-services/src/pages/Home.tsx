@@ -1,7 +1,8 @@
 import { Link } from "wouter";
-import { ArrowLeft, ArrowRight, Building2, BookA, Globe, CheckCircle2, MessageCircle, Phone, Instagram, Zap, Sparkles, CreditCard, Banknote, X, RefreshCw } from "lucide-react";
+import { ArrowLeft, ArrowRight, Building2, BookA, Globe, CheckCircle2, MessageCircle, Phone, Instagram, Zap, Sparkles, CreditCard, Banknote, X, RefreshCw, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -10,6 +11,9 @@ export default function Home() {
   const { t, dir, language } = useLanguage();
   const [selectedPkg, setSelectedPkg] = useState<any>(null);
   const [showSAR, setShowSAR] = useState(false);
+  const [tamaraStep, setTamaraStep] = useState<"idle" | "form" | "loading">("idle");
+  const [tamaraForm, setTamaraForm] = useState({ name: "", phone: "", email: "" });
+  const [tamaraError, setTamaraError] = useState("");
 
   const MYR_TO_SAR = 0.80;
   const toSAR = (myrPrice: string) => {
@@ -482,28 +486,100 @@ export default function Home() {
                 </a>
 
                 {/* Tamara */}
-                <a
-                  href={`https://wa.me/966562022668?text=${encodeURIComponent(
-                    language === 'ar'
-                      ? `أريد الاشتراك في ${selectedPkg.nameAr}\nالسعر: MYR ${selectedPkg.discountedPrice}\nطريقة الدفع: تمارا (Tamara) - 3 أقساط`
-                      : `I want to subscribe to ${selectedPkg.nameEn}\nPrice: MYR ${selectedPkg.discountedPrice}\nPayment: Tamara - 3 installments`
-                  )}`}
-                  target="_blank" rel="noopener noreferrer"
-                  className="block" data-testid="btn-pay-tamara-home"
-                >
-                  <Button variant="outline" className={`w-full py-5 text-base font-bold justify-between border-2 hover:border-[#F5A623] hover:bg-[#F5A623]/5 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
-                    <div className={`flex items-center gap-3 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
-                      <div className="w-10 h-10 rounded-xl bg-[#F5A623]/10 flex items-center justify-center">
-                        <CreditCard className="w-5 h-5 text-[#F5A623]" />
+                {tamaraStep === "idle" && (
+                  <button
+                    className="block w-full text-left"
+                    data-testid="btn-pay-tamara-home"
+                    onClick={() => { setTamaraStep("form"); setTamaraError(""); }}
+                  >
+                    <div className={`w-full py-4 px-4 text-base font-bold flex items-center justify-between border-2 rounded-lg hover:border-[#F5A623] hover:bg-[#F5A623]/5 transition-all ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                      <div className={`flex items-center gap-3 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                        <div className="w-10 h-10 rounded-xl bg-[#F5A623]/10 flex items-center justify-center">
+                          <CreditCard className="w-5 h-5 text-[#F5A623]" />
+                        </div>
+                        <div className={dir === "rtl" ? "text-right" : "text-left"}>
+                          <span className="block font-bold">Tamara</span>
+                          <span className="text-xs text-muted-foreground">{language === 'ar' ? "قسّمها على 3 دفعات" : "Split into 3 payments"}</span>
+                        </div>
                       </div>
-                      <div className={dir === "rtl" ? "text-right" : "text-left"}>
-                        <span className="block font-bold">Tamara</span>
-                        <span className="text-xs text-muted-foreground">{language === 'ar' ? "قسّمها على 3 دفعات" : "Split into 3 payments"}</span>
-                      </div>
+                      <ArrowLeft className={`w-4 h-4 ${dir === "rtl" ? "" : "rotate-180"}`} />
                     </div>
-                    <ArrowLeft className={`w-4 h-4 ${dir === "rtl" ? "" : "rotate-180"}`} />
-                  </Button>
-                </a>
+                  </button>
+                )}
+                {(tamaraStep === "form" || tamaraStep === "loading") && (
+                  <div className="border-2 border-[#F5A623]/40 rounded-xl p-4 space-y-3 bg-[#F5A623]/5">
+                    <p className={`text-sm font-bold flex items-center gap-2 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                      <CreditCard className="w-4 h-4 text-[#F5A623]" />
+                      {language === 'ar' ? "بيانات الدفع عبر تمارا" : "Pay with Tamara"}
+                    </p>
+                    <Input
+                      placeholder={language === 'ar' ? "الاسم الكامل" : "Full Name"}
+                      value={tamaraForm.name}
+                      onChange={e => setTamaraForm(f => ({ ...f, name: e.target.value }))}
+                      dir={dir}
+                      disabled={tamaraStep === "loading"}
+                    />
+                    <Input
+                      placeholder={language === 'ar' ? "رقم الجوال (05xxxxxxxx)" : "Phone (05xxxxxxxx)"}
+                      value={tamaraForm.phone}
+                      onChange={e => setTamaraForm(f => ({ ...f, phone: e.target.value }))}
+                      dir="ltr"
+                      disabled={tamaraStep === "loading"}
+                    />
+                    <Input
+                      placeholder={language === 'ar' ? "البريد الإلكتروني" : "Email"}
+                      value={tamaraForm.email}
+                      onChange={e => setTamaraForm(f => ({ ...f, email: e.target.value }))}
+                      dir="ltr"
+                      type="email"
+                      disabled={tamaraStep === "loading"}
+                    />
+                    {tamaraError && (
+                      <p className="text-xs text-red-500">{tamaraError}</p>
+                    )}
+                    <div className={`flex gap-2 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                      <Button
+                        className="flex-1 bg-[#F5A623] hover:bg-[#e09510] text-white font-bold"
+                        disabled={tamaraStep === "loading"}
+                        onClick={async () => {
+                          if (!tamaraForm.name || !tamaraForm.phone) {
+                            setTamaraError(language === 'ar' ? "يرجى إدخال الاسم ورقم الجوال" : "Please enter name and phone");
+                            return;
+                          }
+                          setTamaraStep("loading");
+                          setTamaraError("");
+                          try {
+                            const res = await fetch("/api/payments/tamara/checkout", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                packageName: language === 'ar' ? selectedPkg.nameAr : selectedPkg.nameEn,
+                                packagePrice: selectedPkg.discountedPrice,
+                                customerName: tamaraForm.name,
+                                customerPhone: tamaraForm.phone,
+                                customerEmail: tamaraForm.email,
+                                language,
+                              }),
+                            });
+                            const data = await res.json();
+                            if (!res.ok) throw new Error(data.message || "Error");
+                            window.location.href = data.checkout_url;
+                          } catch (err: any) {
+                            setTamaraError(err.message || (language === 'ar' ? "حدث خطأ، حاول مرة أخرى" : "Something went wrong"));
+                            setTamaraStep("form");
+                          }
+                        }}
+                      >
+                        {tamaraStep === "loading"
+                          ? <Loader2 className="w-4 h-4 animate-spin" />
+                          : (language === 'ar' ? "ادفع الآن" : "Pay Now")}
+                      </Button>
+                      <Button variant="outline" onClick={() => { setTamaraStep("idle"); setTamaraError(""); }} disabled={tamaraStep === "loading"}>
+                        {language === 'ar' ? "إلغاء" : "Cancel"}
+                      </Button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Bank Transfer */}
                 <div
