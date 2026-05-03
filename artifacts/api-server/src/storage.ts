@@ -14,7 +14,7 @@ import {
   type Announcement,
   type InsertAnnouncement,
 } from "@workspace/db";
-import { eq, desc, asc } from "drizzle-orm";
+import { eq, desc, asc, sql } from "drizzle-orm";
 
 export interface IStorage {
   getInstitutions(type?: string): Promise<Institution[]>;
@@ -41,10 +41,11 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   async getInstitutions(type?: string): Promise<Institution[]> {
+    const othersLast = sql`CASE WHEN ${institutions.name} = 'Others' THEN 1 ELSE 0 END`;
     if (type) {
-      return await db.select().from(institutions).where(eq(institutions.type, type));
+      return await db.select().from(institutions).where(eq(institutions.type, type)).orderBy(othersLast, institutions.name);
     }
-    return await db.select().from(institutions);
+    return await db.select().from(institutions).orderBy(othersLast, institutions.name);
   }
 
   async getInstitution(id: number): Promise<Institution | undefined> {
