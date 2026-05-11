@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { GraduationCap, BookOpen, LayoutDashboard, Languages, Megaphone } from "lucide-react";
+import { GraduationCap, BookOpen, LayoutDashboard, Languages, Megaphone, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/lib/i18n";
 import {
@@ -19,6 +19,7 @@ export function Navbar() {
     { href: "/institutions?type=language_center", label: t("nav.language_centers"), icon: BookOpen },
     { href: "/announcements", label: t("nav.announcements"), icon: Megaphone },
     { href: "/dashboard", label: t("nav.my_applications"), icon: LayoutDashboard },
+    { href: "/about", label: language === "ar" ? "من نحن" : "About Us", icon: Info },
   ];
 
   return (
