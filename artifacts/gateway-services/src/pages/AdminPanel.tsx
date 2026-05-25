@@ -77,7 +77,9 @@ export default function AdminPanel() {
       setLoginError("");
       setUsername("");
       setPassword("");
-      refetchAdmin();
+      const { token: _token, ...adminData } = data;
+      queryClient.setQueryData(["/api/admin/me"], adminData);
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/announcements"] });
     },
     onError: () => {
       setLoginError(t("ann.login_error"));
