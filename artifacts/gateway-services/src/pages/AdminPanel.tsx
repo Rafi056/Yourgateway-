@@ -27,7 +27,7 @@ export default function AdminPanel() {
   const { data: admin, isLoading: checkingAuth, refetch: refetchAdmin } = useQuery({
     queryKey: ["/api/admin/me"],
     queryFn: async () => {
-      const res = await fetch("/api/admin/me");
+      const res = await fetch("/api/admin/me", { credentials: "include" });
       if (!res.ok) return null;
       return res.json();
     },
@@ -37,7 +37,7 @@ export default function AdminPanel() {
   const { data: myAnnouncements, isLoading: loadingAnn } = useQuery({
     queryKey: ["/api/admin/announcements"],
     queryFn: async () => {
-      const res = await fetch("/api/admin/announcements");
+      const res = await fetch("/api/admin/announcements", { credentials: "include" });
       if (!res.ok) return [];
       return res.json();
     },
