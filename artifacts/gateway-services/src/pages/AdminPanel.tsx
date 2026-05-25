@@ -7,7 +7,24 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2, LogOut, Trash2, Plus, Megaphone, Lock, Calendar } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+
+const TOKEN_KEY = "gw_admin_token";
+
+function getToken() { return localStorage.getItem(TOKEN_KEY); }
+function setToken(t: string) { localStorage.setItem(TOKEN_KEY, t); }
+function clearToken() { localStorage.removeItem(TOKEN_KEY); }
+
+function authFetch(url: string, options: RequestInit = {}) {
+  const token = getToken();
+  return fetch(url, {
+    ...options,
+    headers: {
+      ...(options.headers || {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options.body ? { "Content-Type": "application/json" } : {}),
+    },
+  });
+}
 
 export default function AdminPanel() {
   const { t, dir, language } = useLanguage();
@@ -27,8 +44,9 @@ export default function AdminPanel() {
   const { data: admin, isLoading: checkingAuth, refetch: refetchAdmin } = useQuery({
     queryKey: ["/api/admin/me"],
     queryFn: async () => {
-      const res = await fetch("/api/admin/me", { credentials: "include" });
-      if (!res.ok) return null;
+      if (!getToken()) return null;
+      const res = await authFetch("/api/admin/me");
+      if (!res.ok) { clearToken(); return null; }
       return res.json();
     },
     retry: false,
@@ -37,7 +55,7 @@ export default function AdminPanel() {
   const { data: myAnnouncements, isLoading: loadingAnn } = useQuery({
     queryKey: ["/api/admin/announcements"],
     queryFn: async () => {
-      const res = await fetch("/api/admin/announcements", { credentials: "include" });
+      const res = await authFetch("/api/admin/announcements");
       if (!res.ok) return [];
       return res.json();
     },
@@ -46,10 +64,16 @@ export default function AdminPanel() {
 
   const loginMutation = useMutation({
     mutationFn: async () => {
-      const res = await apiRequest("POST", "/api/admin/login", { username, password });
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      if (!res.ok) throw new Error("Invalid credentials");
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      if (data.token) setToken(data.token);
       setLoginError("");
       setUsername("");
       setPassword("");
@@ -62,7 +86,8 @@ export default function AdminPanel() {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("POST", "/api/admin/logout");
+      await authFetch("/api/admin/logout", { method: "POST" });
+      clearToken();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/me"] });
@@ -72,42 +97,33 @@ export default function AdminPanel() {
 
   const publishMutation = useMutation({
     mutationFn: async () => {
-      const res = await apiRequest("POST", "/api/announcements", {
-        titleAr, titleEn, contentAr, contentEn,
-        imageUrl: imageUrl || null,
+      const res = await authFetch("/api/announcements", {
+        method: "POST",
+        body: JSON.stringify({ titleAr, titleEn, contentAr, contentEn, imageUrl: imageUrl || null }),
       });
+      if (!res.ok) throw new Error("Failed");
       return res.json();
     },
     onSuccess: () => {
-      setTitleAr("");
-      setTitleEn("");
-      setContentAr("");
-      setContentEn("");
-      setImageUrl("");
+      setTitleAr(""); setTitleEn(""); setContentAr(""); setContentEn(""); setImageUrl("");
       queryClient.invalidateQueries({ queryKey: ["/api/admin/announcements"] });
       queryClient.invalidateQueries({ queryKey: ["/api/announcements"] });
-      toast({
-        title: language === "ar" ? "تم نشر الإعلان بنجاح" : "Announcement published successfully",
-      });
+      toast({ title: language === "ar" ? "تم نشر الإعلان بنجاح" : "Announcement published successfully" });
     },
     onError: () => {
-      toast({
-        title: language === "ar" ? "فشل نشر الإعلان" : "Failed to publish announcement",
-        variant: "destructive",
-      });
+      toast({ title: language === "ar" ? "فشل نشر الإعلان" : "Failed to publish", variant: "destructive" });
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      await apiRequest("DELETE", `/api/announcements/${id}`);
+      const res = await authFetch(`/api/announcements/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/announcements"] });
       queryClient.invalidateQueries({ queryKey: ["/api/announcements"] });
-      toast({
-        title: language === "ar" ? "تم حذف الإعلان" : "Announcement deleted",
-      });
+      toast({ title: language === "ar" ? "تم حذف الإعلان" : "Announcement deleted" });
     },
   });
 
@@ -146,6 +162,7 @@ export default function AdminPanel() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder={language === "ar" ? "أدخل اسم المستخدم" : "Enter username"}
+                autoComplete="username"
                 data-testid="input-username"
               />
             </div>
@@ -156,6 +173,7 @@ export default function AdminPanel() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={language === "ar" ? "أدخل كلمة المرور" : "Enter password"}
+                autoComplete="current-password"
                 data-testid="input-password"
               />
             </div>
@@ -285,11 +303,7 @@ export default function AdminPanel() {
                       variant="ghost"
                       size="sm"
                       className="text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0"
-                      onClick={() => {
-                        if (confirm(t("ann.confirm_delete"))) {
-                          deleteMutation.mutate(ann.id);
-                        }
-                      }}
+                      onClick={() => { if (confirm(t("ann.confirm_delete"))) deleteMutation.mutate(ann.id); }}
                       data-testid={`btn-delete-${ann.id}`}
                     >
                       <Trash2 className="w-4 h-4" />
