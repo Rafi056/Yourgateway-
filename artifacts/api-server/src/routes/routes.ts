@@ -11,6 +11,7 @@ import jwt from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET || "gateway-jwt-secret-2024";
 
 function getAdminIdFromRequest(req: Request): number | null {
+  // 1. Authorization header (new frontend)
   const auth = req.headers.authorization;
   if (auth && auth.startsWith("Bearer ")) {
     try {
@@ -20,6 +21,17 @@ function getAdminIdFromRequest(req: Request): number | null {
       return null;
     }
   }
+  // 2. JWT cookie (old cached frontend or any browser)
+  const cookieToken = req.cookies?.gw_admin_token;
+  if (cookieToken) {
+    try {
+      const payload = jwt.verify(cookieToken, JWT_SECRET) as { adminId: number };
+      return payload.adminId;
+    } catch {
+      return null;
+    }
+  }
+  // 3. Session fallback
   return req.session?.adminUserId ?? null;
 }
 
@@ -397,6 +409,13 @@ ${allPages
       }
       req.session.adminUserId = admin.id;
       const token = jwt.sign({ adminId: admin.id }, JWT_SECRET, { expiresIn: "7d" });
+      res.cookie("gw_admin_token", token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: "/",
+      });
       const institution = await storage.getInstitution(admin.institutionId!);
       res.json({
         id: admin.id,
@@ -438,6 +457,7 @@ ${allPages
 
   app.post("/api/admin/logout", (req, res) => {
     req.session.destroy(() => {});
+    res.clearCookie("gw_admin_token", { path: "/", secure: true, sameSite: "none" });
     res.json({ message: "Logged out" });
   });
 
