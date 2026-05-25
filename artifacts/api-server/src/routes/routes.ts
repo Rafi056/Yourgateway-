@@ -182,25 +182,63 @@ async function seedDatabase() {
     }
   }
 
-  const existingAdmins = await storage.getAdminByUsername("admin1");
-  if (!existingAdmins) {
-    const allInstitutions = await storage.getInstitutions("language_center");
-    const hash = await bcrypt.hash("admin123", 10);
-    if (allInstitutions.length >= 2) {
+  // Seed or update admin accounts for all institutions
+  const allInstitutions = await storage.getInstitutions();
+  const institutionByName = Object.fromEntries(allInstitutions.map((i) => [i.name, i.id]));
+
+  const adminAccounts = [
+    // Language centers
+    { username: "admin1",      password: "admin123",    nameAr: "مدير معهد بريتانيا",             nameEn: "Britannia Admin",       institution: "Britannia Language Centre" },
+    { username: "Sheff123",    password: "Nourshef07",  nameAr: "مدير معهد شيفيلد",               nameEn: "Sheffield Admin",       institution: "Sheffield Academy" },
+    { username: "bigben",      password: "gateway2024", nameAr: "مدير Big Ben Academy",            nameEn: "Big Ben Admin",         institution: "Big Ben Academy" },
+    { username: "bright",      password: "gateway2024", nameAr: "مدير Bright Language Center",     nameEn: "Bright Admin",          institution: "Bright Language Center" },
+    { username: "ems",         password: "gateway2024", nameAr: "مدير EMS Language Centre",        nameEn: "EMS Admin",             institution: "EMS Language Centre" },
+    { username: "excel",       password: "gateway2024", nameAr: "مدير EXCEL Language Center",      nameEn: "EXCEL Admin",           institution: "EXCEL Language Center" },
+    { username: "erican",      password: "gateway2024", nameAr: "مدير Erican Language Center",     nameEn: "Erican Admin",          institution: "Erican Language Center" },
+    { username: "studycircle", password: "gateway2024", nameAr: "مدير Study Circle",               nameEn: "Study Circle Admin",    institution: "Study circle language center" },
+    { username: "webster",     password: "gateway2024", nameAr: "مدير Webster Language Center",    nameEn: "Webster Admin",         institution: "Webster Language Center" },
+    // Universities
+    { username: "apu",         password: "gateway2024", nameAr: "مدير APU",                        nameEn: "APU Admin",             institution: "APU" },
+    { username: "almadinah",   password: "gateway2024", nameAr: "مدير Al-Madinah",                 nameEn: "Al-Madinah Admin",      institution: "Al-Madinah" },
+    { username: "city",        password: "gateway2024", nameAr: "مدير City University",             nameEn: "City Admin",            institution: "City" },
+    { username: "cyberjaya",   password: "gateway2024", nameAr: "مدير Cyberjaya",                  nameEn: "Cyberjaya Admin",       institution: "Cyberjaya" },
+    { username: "geometika",   password: "gateway2024", nameAr: "مدير Geometika",                  nameEn: "Geometika Admin",       institution: "Geometika" },
+    { username: "iium",        password: "gateway2024", nameAr: "مدير IIUM",                       nameEn: "IIUM Admin",            institution: "IIUM" },
+    { username: "lincoln",     password: "gateway2024", nameAr: "مدير Lincoln",                    nameEn: "Lincoln Admin",         institution: "Lincoln" },
+    { username: "mmu",         password: "gateway2024", nameAr: "مدير MMU",                        nameEn: "MMU Admin",             institution: "MMU" },
+    { username: "msu",         password: "gateway2024", nameAr: "مدير MSU",                        nameEn: "MSU Admin",             institution: "MSU" },
+    { username: "mahsa",       password: "gateway2024", nameAr: "مدير Mahsa",                      nameEn: "Mahsa Admin",           institution: "Mahsa" },
+    { username: "monash",      password: "gateway2024", nameAr: "مدير Monash",                     nameEn: "Monash Admin",          institution: "Monash" },
+    { username: "segi",        password: "gateway2024", nameAr: "مدير SEGI",                       nameEn: "SEGI Admin",            institution: "SEGI" },
+    { username: "taylors",     password: "gateway2024", nameAr: "مدير Taylor's",                   nameEn: "Taylor's Admin",        institution: "Taylor's" },
+    { username: "ucsi",        password: "gateway2024", nameAr: "مدير UCSI",                       nameEn: "UCSI Admin",            institution: "UCSI" },
+    { username: "ukm",         password: "gateway2024", nameAr: "مدير UKM",                        nameEn: "UKM Admin",             institution: "UKM" },
+    { username: "uniten",      password: "gateway2024", nameAr: "مدير UNITEN",                     nameEn: "UNITEN Admin",          institution: "UNITEN" },
+  ];
+
+  // Remove old admin2 account if it exists (replaced by Sheff123)
+  const oldAdmin2 = await storage.getAdminByUsername("admin2");
+  if (oldAdmin2) {
+    await db.delete(adminUsers).where(eq(adminUsers.username, "admin2"));
+  }
+
+  for (const acc of adminAccounts) {
+    const institutionId = institutionByName[acc.institution];
+    if (!institutionId) continue;
+    const existing = await storage.getAdminByUsername(acc.username);
+    const hash = await bcrypt.hash(acc.password, 10);
+    if (!existing) {
       await storage.createAdminUser({
-        username: "admin1",
+        username: acc.username,
         passwordHash: hash,
-        institutionId: allInstitutions[0].id,
-        nameAr: "مدير معهد بريتانيا",
-        nameEn: "Britannia Admin",
+        institutionId,
+        nameAr: acc.nameAr,
+        nameEn: acc.nameEn,
       });
-      await storage.createAdminUser({
-        username: "admin2",
-        passwordHash: hash,
-        institutionId: allInstitutions[1].id,
-        nameAr: "مدير معهد شيفيلد",
-        nameEn: "Sheffield Admin",
-      });
+    } else {
+      await db.update(adminUsers)
+        .set({ passwordHash: hash, institutionId, nameAr: acc.nameAr, nameEn: acc.nameEn })
+        .where(eq(adminUsers.username, acc.username));
     }
   }
 }
