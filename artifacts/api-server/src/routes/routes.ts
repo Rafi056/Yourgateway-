@@ -619,6 +619,8 @@ ${allPages
         adminUserId: admin.id,
         imageUrl: req.body.imageUrl || null,
         pdfUrl: req.body.pdfUrl || null,
+        pdfUrl2: req.body.pdfUrl2 || null,
+        pdfUrl3: req.body.pdfUrl3 || null,
       });
       const announcement = await storage.createAnnouncement(validated);
       res.status(201).json(announcement);

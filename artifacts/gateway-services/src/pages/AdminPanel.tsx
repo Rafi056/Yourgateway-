@@ -60,11 +60,15 @@ export default function AdminPanel() {
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [pdfFiles, setPdfFiles] = useState<(File | null)[]>([null, null, null]);
   const [isUploading, setIsUploading] = useState(false);
 
   const imageInputRef = useRef<HTMLInputElement>(null);
-  const pdfInputRef = useRef<HTMLInputElement>(null);
+  const pdfInputRefs = [
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+  ];
 
   const { data: admin, isLoading: checkingAuth } = useQuery({
     queryKey: ["/api/admin/me"],
@@ -125,24 +129,29 @@ export default function AdminPanel() {
       setIsUploading(true);
       let imageUrl: string | null = null;
       let pdfUrl: string | null = null;
+      let pdfUrl2: string | null = null;
+      let pdfUrl3: string | null = null;
 
       try {
         if (imageFile) imageUrl = await uploadFile(imageFile);
-        if (pdfFile) pdfUrl = await uploadFile(pdfFile);
+        if (pdfFiles[0]) pdfUrl = await uploadFile(pdfFiles[0]);
+        if (pdfFiles[1]) pdfUrl2 = await uploadFile(pdfFiles[1]);
+        if (pdfFiles[2]) pdfUrl3 = await uploadFile(pdfFiles[2]);
       } finally {
         setIsUploading(false);
       }
 
       const res = await authFetch("/api/announcements", {
         method: "POST",
-        body: JSON.stringify({ titleAr, titleEn, contentAr, contentEn, imageUrl, pdfUrl }),
+        body: JSON.stringify({ titleAr, titleEn, contentAr, contentEn, imageUrl, pdfUrl, pdfUrl2, pdfUrl3 }),
       });
       if (!res.ok) throw new Error("Failed");
       return res.json();
     },
     onSuccess: () => {
       setTitleAr(""); setTitleEn(""); setContentAr(""); setContentEn("");
-      setImageFile(null); setImagePreview(null); setPdfFile(null);
+      setImageFile(null); setImagePreview(null); setPdfFiles([null, null, null]);
+      pdfInputRefs.forEach(r => { if (r.current) r.current.value = ""; });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/announcements"] });
       queryClient.invalidateQueries({ queryKey: ["/api/announcements"] });
       toast({ title: language === "ar" ? "تم نشر الإعلان بنجاح" : "Announcement published successfully" });
@@ -169,10 +178,14 @@ export default function AdminPanel() {
     setImagePreview(URL.createObjectURL(file));
   };
 
-  const handlePdfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setPdfFile(file);
+  const handlePdfChange = (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    setPdfFiles(prev => { const next = [...prev]; next[index] = file; return next; });
+  };
+
+  const removePdf = (index: number) => {
+    setPdfFiles(prev => { const next = [...prev]; next[index] = null; return next; });
+    if (pdfInputRefs[index].current) pdfInputRefs[index].current!.value = "";
   };
 
   if (checkingAuth) {
@@ -285,24 +298,30 @@ export default function AdminPanel() {
                 )}
               </div>
 
-              {/* PDF Upload */}
+              {/* PDF Upload — up to 3 */}
               <div>
-                <label className="block text-sm font-medium mb-2">{language === "ar" ? "ملف PDF (اختياري)" : "PDF file (optional)"}</label>
-                <input ref={pdfInputRef} type="file" accept="application/pdf" className="hidden" onChange={handlePdfChange} />
-                {pdfFile ? (
-                  <div className={`flex items-center gap-3 p-3 bg-muted/50 rounded-xl border border-border ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
-                    <FileText className="w-5 h-5 text-red-500 flex-shrink-0" />
-                    <span className="text-sm flex-grow truncate">{pdfFile.name}</span>
-                    <button type="button" onClick={() => { setPdfFile(null); if (pdfInputRef.current) pdfInputRef.current.value = ""; }} className="text-muted-foreground hover:text-destructive flex-shrink-0">
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ) : (
-                  <button type="button" onClick={() => pdfInputRef.current?.click()} className="w-full border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center gap-2 text-muted-foreground hover:border-primary hover:text-primary transition-colors">
-                    <FileText className="w-8 h-8" />
-                    <span className="text-sm">{language === "ar" ? "اضغط لرفع ملف PDF" : "Click to upload PDF"}</span>
-                  </button>
-                )}
+                <label className="block text-sm font-medium mb-2">{language === "ar" ? "ملفات PDF (حتى 3 ملفات، اختياري)" : "PDF files (up to 3, optional)"}</label>
+                <div className="space-y-2">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i}>
+                      <input ref={pdfInputRefs[i]} type="file" accept="application/pdf" className="hidden" onChange={handlePdfChange(i)} />
+                      {pdfFiles[i] ? (
+                        <div className={`flex items-center gap-3 p-3 bg-muted/50 rounded-xl border border-border ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                          <FileText className="w-5 h-5 text-red-500 flex-shrink-0" />
+                          <span className="text-sm flex-grow truncate">{pdfFiles[i]!.name}</span>
+                          <button type="button" onClick={() => removePdf(i)} className="text-muted-foreground hover:text-destructive flex-shrink-0">
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <button type="button" onClick={() => pdfInputRefs[i].current?.click()} className="w-full border-2 border-dashed border-border rounded-xl p-3 flex items-center gap-3 text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+                          <Upload className="w-5 h-5 flex-shrink-0" />
+                          <span className="text-sm">{language === "ar" ? `ملف PDF ${i + 1}` : `PDF file ${i + 1}`}</span>
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <Button type="submit" className="w-full" disabled={isPending || !titleAr || !titleEn || !contentAr || !contentEn} data-testid="btn-publish">
@@ -344,7 +363,12 @@ export default function AdminPanel() {
                           <span>{new Date(ann.createdAt).toLocaleDateString()}</span>
                         </div>
                         {ann.imageUrl && <span className="flex items-center gap-1 text-xs text-muted-foreground"><ImageIcon className="w-3 h-3" />{language === "ar" ? "صورة" : "Image"}</span>}
-                        {ann.pdfUrl && <span className="flex items-center gap-1 text-xs text-red-500"><FileText className="w-3 h-3" />PDF</span>}
+                        {[ann.pdfUrl, ann.pdfUrl2, ann.pdfUrl3].filter(Boolean).length > 0 && (
+                          <span className="flex items-center gap-1 text-xs text-red-500">
+                            <FileText className="w-3 h-3" />
+                            {[ann.pdfUrl, ann.pdfUrl2, ann.pdfUrl3].filter(Boolean).length} PDF
+                          </span>
+                        )}
                       </div>
                     </div>
                     <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0" onClick={() => { if (confirm(t("ann.confirm_delete"))) deleteMutation.mutate(ann.id); }} data-testid={`btn-delete-${ann.id}`}>

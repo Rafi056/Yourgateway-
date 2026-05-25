@@ -457,16 +457,21 @@ export default function InstitutionDetails() {
                           <span className="opacity-50">•</span>
                           <span>{t("ann.posted_by")} {language === "ar" ? ann.adminNameAr : ann.adminNameEn}</span>
                         </div>
-                        {ann.pdfUrl && (
-                          <a
-                            href={ann.pdfUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={`mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors text-sm font-medium border border-red-200 ${dir === "rtl" ? "flex-row-reverse" : ""}`}
-                          >
-                            <FileText className="w-4 h-4" />
-                            {language === "ar" ? "تحميل الملف PDF" : "Download PDF"}
-                          </a>
+                        {[ann.pdfUrl, ann.pdfUrl2, ann.pdfUrl3].filter(Boolean).length > 0 && (
+                          <div className={`mt-3 flex flex-wrap gap-2 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                            {[ann.pdfUrl, ann.pdfUrl2, ann.pdfUrl3].filter(Boolean).map((url: string, i: number) => (
+                              <a
+                                key={i}
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors text-sm font-medium border border-red-200 ${dir === "rtl" ? "flex-row-reverse" : ""}`}
+                              >
+                                <FileText className="w-4 h-4" />
+                                {language === "ar" ? `تحميل PDF ${[ann.pdfUrl, ann.pdfUrl2, ann.pdfUrl3].filter(Boolean).length > 1 ? i + 1 : ""}`.trim() : `Download PDF${[ann.pdfUrl, ann.pdfUrl2, ann.pdfUrl3].filter(Boolean).length > 1 ? ` ${i + 1}` : ""}`}
+                              </a>
+                            ))}
+                          </div>
                         )}
                       </div>
                     </motion.div>
