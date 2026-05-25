@@ -618,6 +618,7 @@ ${allPages
         institutionId: admin.institutionId,
         adminUserId: admin.id,
         imageUrl: req.body.imageUrl || null,
+        pdfUrl: req.body.pdfUrl || null,
       });
       const announcement = await storage.createAnnouncement(validated);
       res.status(201).json(announcement);

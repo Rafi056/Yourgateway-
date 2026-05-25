@@ -67,6 +67,7 @@ export const announcements = pgTable("announcements", {
   contentAr: text("content_ar").notNull(),
   contentEn: text("content_en").notNull(),
   imageUrl: text("image_url"),
+  pdfUrl: text("pdf_url"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

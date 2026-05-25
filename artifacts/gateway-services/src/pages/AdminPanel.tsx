@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, LogOut, Trash2, Plus, Megaphone, Lock, Calendar } from "lucide-react";
+import { Loader2, LogOut, Trash2, Plus, Megaphone, Lock, Calendar, ImageIcon, FileText, X, Upload } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 
@@ -21,9 +21,27 @@ function authFetch(url: string, options: RequestInit = {}) {
     headers: {
       ...(options.headers || {}),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.body ? { "Content-Type": "application/json" } : {}),
+      ...(options.body && typeof options.body === "string" ? { "Content-Type": "application/json" } : {}),
     },
   });
+}
+
+async function uploadFile(file: File): Promise<string> {
+  const urlRes = await authFetch("/api/storage/uploads/request-url", {
+    method: "POST",
+    body: JSON.stringify({ name: file.name, size: file.size, contentType: file.type || "application/octet-stream" }),
+  });
+  if (!urlRes.ok) throw new Error("Failed to get upload URL");
+  const { uploadURL, objectPath } = await urlRes.json();
+
+  const putRes = await fetch(uploadURL, {
+    method: "PUT",
+    body: file,
+    headers: { "Content-Type": file.type || "application/octet-stream" },
+  });
+  if (!putRes.ok) throw new Error("Failed to upload file");
+
+  return `/api/storage${objectPath}`;
 }
 
 export default function AdminPanel() {
@@ -39,9 +57,16 @@ export default function AdminPanel() {
   const [titleEn, setTitleEn] = useState("");
   const [contentAr, setContentAr] = useState("");
   const [contentEn, setContentEn] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
 
-  const { data: admin, isLoading: checkingAuth, refetch: refetchAdmin } = useQuery({
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const pdfInputRef = useRef<HTMLInputElement>(null);
+
+  const { data: admin, isLoading: checkingAuth } = useQuery({
     queryKey: ["/api/admin/me"],
     queryFn: async () => {
       if (!getToken()) return null;
@@ -81,9 +106,7 @@ export default function AdminPanel() {
       queryClient.setQueryData(["/api/admin/me"], adminData);
       queryClient.invalidateQueries({ queryKey: ["/api/admin/announcements"] });
     },
-    onError: () => {
-      setLoginError(t("ann.login_error"));
-    },
+    onError: () => setLoginError(t("ann.login_error")),
   });
 
   const logoutMutation = useMutation({
@@ -99,22 +122,32 @@ export default function AdminPanel() {
 
   const publishMutation = useMutation({
     mutationFn: async () => {
+      setIsUploading(true);
+      let imageUrl: string | null = null;
+      let pdfUrl: string | null = null;
+
+      try {
+        if (imageFile) imageUrl = await uploadFile(imageFile);
+        if (pdfFile) pdfUrl = await uploadFile(pdfFile);
+      } finally {
+        setIsUploading(false);
+      }
+
       const res = await authFetch("/api/announcements", {
         method: "POST",
-        body: JSON.stringify({ titleAr, titleEn, contentAr, contentEn, imageUrl: imageUrl || null }),
+        body: JSON.stringify({ titleAr, titleEn, contentAr, contentEn, imageUrl, pdfUrl }),
       });
       if (!res.ok) throw new Error("Failed");
       return res.json();
     },
     onSuccess: () => {
-      setTitleAr(""); setTitleEn(""); setContentAr(""); setContentEn(""); setImageUrl("");
+      setTitleAr(""); setTitleEn(""); setContentAr(""); setContentEn("");
+      setImageFile(null); setImagePreview(null); setPdfFile(null);
       queryClient.invalidateQueries({ queryKey: ["/api/admin/announcements"] });
       queryClient.invalidateQueries({ queryKey: ["/api/announcements"] });
       toast({ title: language === "ar" ? "تم نشر الإعلان بنجاح" : "Announcement published successfully" });
     },
-    onError: () => {
-      toast({ title: language === "ar" ? "فشل نشر الإعلان" : "Failed to publish", variant: "destructive" });
-    },
+    onError: () => toast({ title: language === "ar" ? "فشل نشر الإعلان" : "Failed to publish", variant: "destructive" }),
   });
 
   const deleteMutation = useMutation({
@@ -128,6 +161,19 @@ export default function AdminPanel() {
       toast({ title: language === "ar" ? "تم حذف الإعلان" : "Announcement deleted" });
     },
   });
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const handlePdfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPdfFile(file);
+  };
 
   if (checkingAuth) {
     return (
@@ -156,32 +202,16 @@ export default function AdminPanel() {
           <p className="text-muted-foreground text-center text-sm mb-8">
             {language === "ar" ? "سجل دخولك لإضافة إعلانات المعهد" : "Sign in to manage your institution announcements"}
           </p>
-
           <form onSubmit={(e) => { e.preventDefault(); loginMutation.mutate(); }} className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1">{t("ann.username")}</label>
-              <Input
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder={language === "ar" ? "أدخل اسم المستخدم" : "Enter username"}
-                autoComplete="username"
-                data-testid="input-username"
-              />
+              <Input value={username} onChange={(e) => setUsername(e.target.value)} placeholder={language === "ar" ? "أدخل اسم المستخدم" : "Enter username"} autoComplete="username" data-testid="input-username" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">{t("ann.password")}</label>
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder={language === "ar" ? "أدخل كلمة المرور" : "Enter password"}
-                autoComplete="current-password"
-                data-testid="input-password"
-              />
+              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={language === "ar" ? "أدخل كلمة المرور" : "Enter password"} autoComplete="current-password" data-testid="input-password" />
             </div>
-            {loginError && (
-              <p className="text-destructive text-sm font-medium" data-testid="text-login-error">{loginError}</p>
-            )}
+            {loginError && <p className="text-destructive text-sm font-medium" data-testid="text-login-error">{loginError}</p>}
             <Button type="submit" className="w-full" disabled={loginMutation.isPending} data-testid="btn-login">
               {loginMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : t("ann.login_btn")}
             </Button>
@@ -191,26 +221,18 @@ export default function AdminPanel() {
     );
   }
 
+  const isPending = publishMutation.isPending || isUploading;
+
   return (
     <div className={`min-h-screen bg-muted/30 ${dir === "rtl" ? "text-right" : "text-left"}`}>
       <div className="bg-primary text-primary-foreground py-6">
         <div className="container mx-auto px-4 md:px-6">
           <div className={`flex items-center justify-between ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
             <div>
-              <h1 className="font-serif text-xl font-bold">
-                {language === "ar" ? "إدارة الإعلانات" : "Announcements Management"}
-              </h1>
-              <p className="text-white/80 text-sm">
-                {language === "ar" ? admin.nameAr : admin.nameEn} — {admin.institutionName}
-              </p>
+              <h1 className="font-serif text-xl font-bold">{language === "ar" ? "إدارة الإعلانات" : "Announcements Management"}</h1>
+              <p className="text-white/80 text-sm">{language === "ar" ? admin.nameAr : admin.nameEn} — {admin.institutionName}</p>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => logoutMutation.mutate()}
-              className={`flex items-center gap-2 bg-white/10 border-white/20 text-white hover:bg-white/20 ${dir === "rtl" ? "flex-row-reverse" : ""}`}
-              data-testid="btn-logout"
-            >
+            <Button variant="outline" size="sm" onClick={() => logoutMutation.mutate()} className={`flex items-center gap-2 bg-white/10 border-white/20 text-white hover:bg-white/20 ${dir === "rtl" ? "flex-row-reverse" : ""}`} data-testid="btn-logout">
               <LogOut className="w-4 h-4" />
               {t("ann.logout")}
             </Button>
@@ -220,11 +242,7 @@ export default function AdminPanel() {
 
       <div className="container mx-auto px-4 md:px-6 py-8">
         <div className="max-w-2xl mx-auto space-y-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-card rounded-2xl p-6 border border-border shadow-sm"
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-card rounded-2xl p-6 border border-border shadow-sm">
             <div className={`flex items-center gap-2 mb-6 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
               <Plus className="w-5 h-5 text-primary" />
               <h2 className="font-serif text-xl font-bold">{t("ann.new_announcement")}</h2>
@@ -247,18 +265,49 @@ export default function AdminPanel() {
                 <label className="block text-sm font-medium mb-1">{t("ann.content_en")}</label>
                 <Textarea value={contentEn} onChange={(e) => setContentEn(e.target.value)} rows={4} dir="ltr" data-testid="input-content-en" />
               </div>
+
+              {/* Image Upload */}
               <div>
-                <label className="block text-sm font-medium mb-1">{t("ann.image_url")}</label>
-                <Input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} dir="ltr" placeholder="https://..." data-testid="input-image-url" />
+                <label className="block text-sm font-medium mb-2">{language === "ar" ? "صورة (اختياري)" : "Image (optional)"}</label>
+                <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+                {imagePreview ? (
+                  <div className="relative rounded-xl overflow-hidden border border-border">
+                    <img src={imagePreview} alt="preview" className="w-full h-40 object-cover" />
+                    <button type="button" onClick={() => { setImageFile(null); setImagePreview(null); if (imageInputRef.current) imageInputRef.current.value = ""; }} className="absolute top-2 right-2 bg-black/50 text-white rounded-full p-1 hover:bg-black/70">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <button type="button" onClick={() => imageInputRef.current?.click()} className="w-full border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center gap-2 text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+                    <ImageIcon className="w-8 h-8" />
+                    <span className="text-sm">{language === "ar" ? "اضغط لرفع صورة" : "Click to upload image"}</span>
+                  </button>
+                )}
               </div>
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={publishMutation.isPending || !titleAr || !titleEn || !contentAr || !contentEn}
-                data-testid="btn-publish"
-              >
-                {publishMutation.isPending ? (
-                  <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("ann.publishing")}</>
+
+              {/* PDF Upload */}
+              <div>
+                <label className="block text-sm font-medium mb-2">{language === "ar" ? "ملف PDF (اختياري)" : "PDF file (optional)"}</label>
+                <input ref={pdfInputRef} type="file" accept="application/pdf" className="hidden" onChange={handlePdfChange} />
+                {pdfFile ? (
+                  <div className={`flex items-center gap-3 p-3 bg-muted/50 rounded-xl border border-border ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                    <FileText className="w-5 h-5 text-red-500 flex-shrink-0" />
+                    <span className="text-sm flex-grow truncate">{pdfFile.name}</span>
+                    <button type="button" onClick={() => { setPdfFile(null); if (pdfInputRef.current) pdfInputRef.current.value = ""; }} className="text-muted-foreground hover:text-destructive flex-shrink-0">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <button type="button" onClick={() => pdfInputRef.current?.click()} className="w-full border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center gap-2 text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+                    <FileText className="w-8 h-8" />
+                    <span className="text-sm">{language === "ar" ? "اضغط لرفع ملف PDF" : "Click to upload PDF"}</span>
+                  </button>
+                )}
+              </div>
+
+              <Button type="submit" className="w-full" disabled={isPending || !titleAr || !titleEn || !contentAr || !contentEn} data-testid="btn-publish">
+                {isPending ? (
+                  <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {language === "ar" ? (isUploading ? "جاري رفع الملفات..." : "جاري النشر...") : (isUploading ? "Uploading files..." : "Publishing...")}</>
                 ) : (
                   <><Megaphone className="w-4 h-4 mr-2" /> {t("ann.publish")}</>
                 )}
@@ -266,21 +315,14 @@ export default function AdminPanel() {
             </form>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
+          {/* My Announcements */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
             <div className={`flex items-center gap-2 mb-4 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
               <Megaphone className="w-5 h-5 text-primary" />
               <h2 className="font-serif text-xl font-bold">{t("ann.my_announcements")}</h2>
             </div>
 
-            {loadingAnn && (
-              <div className="flex justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin text-primary" />
-              </div>
-            )}
+            {loadingAnn && <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>}
 
             {myAnnouncements?.length === 0 && !loadingAnn && (
               <div className="bg-card rounded-2xl p-8 border border-dashed text-center">
@@ -296,18 +338,16 @@ export default function AdminPanel() {
                     <div className="flex-grow min-w-0">
                       <h3 className="font-bold text-sm mb-1 truncate">{language === "ar" ? ann.titleAr : ann.titleEn}</h3>
                       <p className="text-muted-foreground text-xs line-clamp-2">{language === "ar" ? ann.contentAr : ann.contentEn}</p>
-                      <div className={`flex items-center gap-1 mt-2 text-xs text-muted-foreground ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
-                        <Calendar className="w-3 h-3" />
-                        <span>{new Date(ann.createdAt).toLocaleDateString()}</span>
+                      <div className={`flex items-center gap-3 mt-2 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                        <div className={`flex items-center gap-1 text-xs text-muted-foreground ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
+                          <Calendar className="w-3 h-3" />
+                          <span>{new Date(ann.createdAt).toLocaleDateString()}</span>
+                        </div>
+                        {ann.imageUrl && <span className="flex items-center gap-1 text-xs text-muted-foreground"><ImageIcon className="w-3 h-3" />{language === "ar" ? "صورة" : "Image"}</span>}
+                        {ann.pdfUrl && <span className="flex items-center gap-1 text-xs text-red-500"><FileText className="w-3 h-3" />PDF</span>}
                       </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0"
-                      onClick={() => { if (confirm(t("ann.confirm_delete"))) deleteMutation.mutate(ann.id); }}
-                      data-testid={`btn-delete-${ann.id}`}
-                    >
+                    <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0" onClick={() => { if (confirm(t("ann.confirm_delete"))) deleteMutation.mutate(ann.id); }} data-testid={`btn-delete-${ann.id}`}>
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>

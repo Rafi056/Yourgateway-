@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/lib/i18n";
-import { Building2, Calendar, Megaphone, Loader2 } from "lucide-react";
+import { Building2, Calendar, Megaphone, Loader2, FileText } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -88,6 +88,17 @@ export default function Announcements() {
                   <span className="opacity-50">•</span>
                   <span>{t("ann.posted_by")} {language === "ar" ? ann.adminNameAr : ann.adminNameEn}</span>
                 </div>
+                {ann.pdfUrl && (
+                  <a
+                    href={ann.pdfUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors text-sm font-medium border border-red-200 ${dir === "rtl" ? "flex-row-reverse" : ""}`}
+                  >
+                    <FileText className="w-4 h-4" />
+                    {language === "ar" ? "تحميل الملف PDF" : "Download PDF"}
+                  </a>
+                )}
               </div>
             </motion.div>
           ))}
