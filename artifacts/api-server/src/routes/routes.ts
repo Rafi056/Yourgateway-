@@ -114,10 +114,32 @@ async function seedDatabase() {
 
   const canonicalPackages = [
     {
+      nameAr: "باقة شهر",
+      nameEn: "1-Month Package",
+      originalPrice: "",
+      discountedPrice: "3,000",
+      savings: "",
+      descriptionAr: "باقة مكثفة لمدة شهر واحد",
+      descriptionEn: "Intensive 1-month package",
+      featuresAr: SHORT_FEATURES_AR,
+      featuresEn: SHORT_FEATURES_EN,
+    },
+    {
+      nameAr: "باقة شهرين",
+      nameEn: "2-Month Package",
+      originalPrice: "",
+      discountedPrice: "4,200",
+      savings: "",
+      descriptionAr: "باقة مكثفة لمدة شهرين",
+      descriptionEn: "Intensive 2-month package",
+      featuresAr: SHORT_FEATURES_AR,
+      featuresEn: SHORT_FEATURES_EN,
+    },
+    {
       nameAr: "باقة 3 أشهر",
       nameEn: "3-Month Package",
       originalPrice: "",
-      discountedPrice: "8,800",
+      discountedPrice: "7,500",
       savings: "",
       descriptionAr: "باقة مكثفة لمدة 3 أشهر",
       descriptionEn: "Intensive 3-month package",
@@ -125,22 +147,10 @@ async function seedDatabase() {
       featuresEn: SHORT_FEATURES_EN,
     },
     {
-      nameAr: "باقة 4 أشهر",
-      nameEn: "4-Month Package",
-      originalPrice: "",
-      discountedPrice: "13,600",
-      savings: "",
-      descriptionAr: "باقة متوسطة لمدة 4 أشهر",
-      descriptionEn: "Intermediate 4-month package",
-      featuresAr: MID_FEATURES_AR,
-      featuresEn: MID_FEATURES_EN,
-      isSpecial: "true",
-    },
-    {
       nameAr: "باقة 6 أشهر",
       nameEn: "6-Month Package",
       originalPrice: "",
-      discountedPrice: "16,300",
+      discountedPrice: "1,650",
       savings: "",
       descriptionAr: "باقة شاملة لمدة 6 أشهر مع كافة الخدمات",
       descriptionEn: "Comprehensive 6-month package with all services",
@@ -151,7 +161,7 @@ async function seedDatabase() {
       nameAr: "باقة 8 أشهر",
       nameEn: "8-Month Package",
       originalPrice: "",
-      discountedPrice: "20,400",
+      discountedPrice: "21,850",
       savings: "",
       descriptionAr: "باقة طويلة الأمد لتعلم اللغة",
       descriptionEn: "Long-term language learning package",
@@ -173,7 +183,7 @@ async function seedDatabase() {
       nameAr: "باقة سنة كاملة",
       nameEn: "Full Year Package",
       originalPrice: "",
-      discountedPrice: "28,500",
+      discountedPrice: "27,650",
       savings: "",
       descriptionAr: "ادرس سنة كاملة واحصل على أفضل تجربة",
       descriptionEn: "Study a full year for the best experience",
@@ -183,31 +193,10 @@ async function seedDatabase() {
     },
   ];
 
-  const existingPackages = await storage.getPackages();
-  if (existingPackages.length === 0) {
-    for (const pkg of canonicalPackages) {
-      await db.insert(packages).values(pkg);
-    }
-  } else {
-    const sortedExisting = [...existingPackages].sort((a, b) => a.id - b.id);
-    for (let i = 0; i < sortedExisting.length && i < canonicalPackages.length; i++) {
-      const existing = sortedExisting[i];
-      const canonical = canonicalPackages[i];
-      await db.update(packages)
-        .set({
-          nameAr: canonical.nameAr,
-          nameEn: canonical.nameEn,
-          originalPrice: canonical.originalPrice,
-          discountedPrice: canonical.discountedPrice,
-          savings: canonical.savings,
-          descriptionAr: canonical.descriptionAr,
-          descriptionEn: canonical.descriptionEn,
-          featuresAr: canonical.featuresAr,
-          featuresEn: canonical.featuresEn,
-          isSpecial: canonical.isSpecial ?? null,
-        })
-        .where(eq(packages.id, existing.id));
-    }
+  // Always sync: delete all and re-insert canonical packages
+  await db.delete(packages);
+  for (const pkg of canonicalPackages) {
+    await db.insert(packages).values(pkg);
   }
 
   // Seed or update admin accounts for all institutions
