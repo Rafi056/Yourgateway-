@@ -150,7 +150,7 @@ async function seedDatabase() {
       nameAr: "باقة 6 أشهر",
       nameEn: "6-Month Package",
       originalPrice: "",
-      discountedPrice: "1,650",
+      discountedPrice: "16,650",
       savings: "",
       descriptionAr: "باقة شاملة لمدة 6 أشهر مع كافة الخدمات",
       descriptionEn: "Comprehensive 6-month package with all services",
