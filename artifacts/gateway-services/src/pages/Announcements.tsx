@@ -67,7 +67,7 @@ export default function Announcements() {
             >
               {ann.imageUrl && (
                 <div className="h-48 bg-muted overflow-hidden">
-                  <img src={ann.imageUrl} alt="" className="w-full h-full object-cover" />
+                  <img src={ann.imageUrl} alt={language === "ar" ? `صورة إعلان: ${ann.titleAr}` : `Announcement image: ${ann.titleEn}`} className="w-full h-full object-cover" />
                 </div>
               )}
               <div className="p-6">
