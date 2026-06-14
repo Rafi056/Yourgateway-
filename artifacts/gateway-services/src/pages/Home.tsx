@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { ArrowLeft, ArrowRight, Building2, BookA, Globe, CheckCircle2, MessageCircle, Phone, Instagram, Zap, Sparkles, CreditCard, Banknote, X, RefreshCw, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Building2, BookA, Globe, CheckCircle2, MessageCircle, Phone, Instagram, Zap, Sparkles, CreditCard, Banknote, X, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,16 +10,9 @@ import { useState } from "react";
 export default function Home() {
   const { t, dir, language } = useLanguage();
   const [selectedPkg, setSelectedPkg] = useState<any>(null);
-  const [showSAR, setShowSAR] = useState(false);
   const [tamaraStep, setTamaraStep] = useState<"idle" | "form" | "loading">("idle");
   const [tamaraForm, setTamaraForm] = useState({ name: "", phone: "", email: "" });
   const [tamaraError, setTamaraError] = useState("");
-
-  const MYR_TO_SAR = 0.80;
-  const toSAR = (myrPrice: string) => {
-    const num = parseFloat(myrPrice.replace(/,/g, ''));
-    return Math.round(num * MYR_TO_SAR).toLocaleString();
-  };
 
   const { data: packagesData } = useQuery({
     queryKey: ["/api/packages"],
@@ -190,28 +183,6 @@ export default function Home() {
             </p>
           </div>
 
-          <div className={`flex items-center justify-between mb-8 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
-            <button
-              onClick={() => setShowSAR(!showSAR)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all border ${dir === "rtl" ? "flex-row-reverse" : ""} ${
-                showSAR 
-                  ? "bg-primary/10 border-primary/30 text-primary" 
-                  : "bg-muted border-border text-muted-foreground hover:bg-muted/80"
-              }`}
-              data-testid="btn-toggle-currency-home"
-            >
-              <RefreshCw className={`w-4 h-4 transition-transform ${showSAR ? "rotate-180" : ""}`} />
-              {showSAR
-                ? (language === 'ar' ? "إخفاء الريال السعودي" : "Hide SAR")
-                : (language === 'ar' ? "عرض بالريال السعودي" : "Show in SAR")
-              }
-            </button>
-            {showSAR && (
-              <span className="text-xs text-muted-foreground">
-                {language === 'ar' ? "* السعر تقريبي - سعر الصرف قد يتغير" : "* Approximate - exchange rate may vary"}
-              </span>
-            )}
-          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {packagesData?.map((pkg: any, idx: number) => (
@@ -239,7 +210,6 @@ export default function Home() {
                   <div className="mb-6">
                     <div className="flex items-baseline gap-2 flex-wrap">
                       <span className="text-4xl font-black text-primary">MYR {pkg.discountedPrice}</span>
-                      {showSAR && <span className="text-lg font-bold text-muted-foreground">(≈ {toSAR(pkg.discountedPrice)} {language === 'ar' ? 'ر.س' : 'SAR'})</span>}
                     </div>
                     {pkg.savings && (
                       <span className="inline-flex items-center mt-2 px-2 py-1 rounded-md bg-green-100 text-green-700 text-xs font-bold">
@@ -419,11 +389,6 @@ export default function Home() {
                 <div className="flex items-baseline gap-2 mt-2 flex-wrap">
                   <span className="text-3xl font-black text-primary">MYR {selectedPkg.discountedPrice}</span>
                 </div>
-                {showSAR && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    ≈ {toSAR(selectedPkg.discountedPrice)} {language === 'ar' ? 'ر.س' : 'SAR'} ({language === 'ar' ? "تقريبي" : "approx."})
-                  </p>
-                )}
               </div>
 
               {/* Free included services */}

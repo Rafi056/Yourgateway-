@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useInstitutions } from "@/hooks/use-institutions";
-import { Building2, MapPin, ArrowRight, ArrowLeft, BookOpen, Loader2, CheckCircle2, Zap, Sparkles, CreditCard, Banknote, MessageCircle, X, RefreshCw } from "lucide-react";
+import { Building2, MapPin, ArrowRight, ArrowLeft, BookOpen, Loader2, CheckCircle2, Zap, Sparkles, CreditCard, Banknote, MessageCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/lib/i18n";
@@ -15,14 +15,6 @@ export default function Institutions() {
   
   const [filterType, setFilterType] = useState<string>(initialType);
   const [selectedPkg, setSelectedPkg] = useState<any>(null);
-  const [showSAR, setShowSAR] = useState(false);
-
-  const MYR_TO_SAR = 0.80;
-  const toSAR = (myrPrice: string) => {
-    const num = parseFloat(myrPrice.replace(/,/g, ''));
-    const sar = Math.round(num * MYR_TO_SAR);
-    return sar.toLocaleString();
-  };
   
   const { data: institutions, isLoading, error } = useInstitutions(
     filterType === "all" ? undefined : (filterType === "packages" ? "language_center" : filterType)
@@ -114,28 +106,6 @@ export default function Institutions() {
 
         {filterType === "packages" ? (
           <>
-          <div className={`flex items-center justify-between mb-6 ${dir === "rtl" ? "flex-row-reverse" : ""}`}>
-            <button
-              onClick={() => setShowSAR(!showSAR)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all border ${dir === "rtl" ? "flex-row-reverse" : ""} ${
-                showSAR 
-                  ? "bg-primary/10 border-primary/30 text-primary" 
-                  : "bg-muted border-border text-muted-foreground hover:bg-muted/80"
-              }`}
-              data-testid="btn-toggle-currency"
-            >
-              <RefreshCw className={`w-4 h-4 transition-transform ${showSAR ? "rotate-180" : ""}`} />
-              {showSAR
-                ? (language === 'ar' ? "إخفاء الريال السعودي" : "Hide SAR")
-                : (language === 'ar' ? "عرض بالريال السعودي" : "Show in SAR")
-              }
-            </button>
-            {showSAR && (
-              <span className="text-xs text-muted-foreground">
-                {language === 'ar' ? "* السعر تقريبي - سعر الصرف قد يتغير" : "* Approximate - exchange rate may vary"}
-              </span>
-            )}
-          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {packagesData?.map((pkg: any, idx: number) => (
               <motion.div
@@ -162,14 +132,12 @@ export default function Institutions() {
                   <div className="mb-8">
                     <div className="flex items-baseline gap-2 flex-wrap">
                       <span className="text-4xl font-black text-primary">MYR {pkg.discountedPrice}</span>
-                      {showSAR && <span className="text-lg font-bold text-muted-foreground">({language === 'ar' ? `≈ ${toSAR(pkg.discountedPrice)} ر.س` : `≈ SAR ${toSAR(pkg.discountedPrice)}`})</span>}
                     </div>
                     {pkg.savings && (
                       <div className="mt-2 inline-flex items-center gap-2 flex-wrap">
                         <span className="inline-flex items-center px-2 py-1 rounded-md bg-green-100 text-green-700 text-xs font-bold">
                           {language === 'ar' ? `وفر MYR ${pkg.savings}` : `Save MYR ${pkg.savings}`}
                         </span>
-                        {showSAR && <span className="text-xs text-green-600 font-medium">({language === 'ar' ? `≈ ${toSAR(pkg.savings)} ر.س` : `≈ SAR ${toSAR(pkg.savings)}`})</span>}
                       </div>
                     )}
                   </div>
@@ -292,11 +260,6 @@ export default function Institutions() {
                 <div className="flex items-baseline gap-2 mt-2 flex-wrap">
                   <span className="text-3xl font-black text-primary">MYR {selectedPkg.discountedPrice}</span>
                 </div>
-                {showSAR && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {language === 'ar' ? `≈ ${toSAR(selectedPkg.discountedPrice)} ر.س` : `≈ SAR ${toSAR(selectedPkg.discountedPrice)}`} <span className="opacity-60">({language === 'ar' ? "تقريبي" : "approx."})</span>
-                  </p>
-                )}
               </div>
 
               <p className="text-sm text-muted-foreground mb-6">
