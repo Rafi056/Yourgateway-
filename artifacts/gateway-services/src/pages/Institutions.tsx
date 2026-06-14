@@ -160,10 +160,6 @@ export default function Institutions() {
                   <p className="text-muted-foreground text-sm mb-6">{language === 'ar' ? pkg.descriptionAr : pkg.descriptionEn}</p>
                   
                   <div className="mb-8">
-                    <div className="flex items-baseline gap-2 mb-1">
-                      <span className="text-sm text-muted-foreground line-through">MYR {pkg.originalPrice}</span>
-                      {showSAR && <span className="text-xs text-muted-foreground line-through">({language === 'ar' ? `≈ ${toSAR(pkg.originalPrice)} ر.س` : `≈ SAR ${toSAR(pkg.originalPrice)}`})</span>}
-                    </div>
                     <div className="flex items-baseline gap-2 flex-wrap">
                       <span className="text-4xl font-black text-primary">MYR {pkg.discountedPrice}</span>
                       {showSAR && <span className="text-lg font-bold text-muted-foreground">({language === 'ar' ? `≈ ${toSAR(pkg.discountedPrice)} ر.س` : `≈ SAR ${toSAR(pkg.discountedPrice)}`})</span>}
@@ -295,7 +291,6 @@ export default function Institutions() {
                 </h3>
                 <div className="flex items-baseline gap-2 mt-2 flex-wrap">
                   <span className="text-3xl font-black text-primary">MYR {selectedPkg.discountedPrice}</span>
-                  <span className="text-sm text-muted-foreground line-through">MYR {selectedPkg.originalPrice}</span>
                 </div>
                 {showSAR && (
                   <p className="text-xs text-muted-foreground mt-1">

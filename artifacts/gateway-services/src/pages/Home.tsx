@@ -237,10 +237,6 @@ export default function Home() {
                   <p className="text-muted-foreground text-sm mb-4">{language === 'ar' ? pkg.descriptionAr : pkg.descriptionEn}</p>
                   
                   <div className="mb-6">
-                    <div className="flex items-baseline gap-2 mb-1">
-                      <span className="text-sm text-muted-foreground line-through">MYR {pkg.originalPrice}</span>
-                      {showSAR && <span className="text-xs text-muted-foreground line-through">(≈ {toSAR(pkg.originalPrice)} {language === 'ar' ? 'ر.س' : 'SAR'})</span>}
-                    </div>
                     <div className="flex items-baseline gap-2 flex-wrap">
                       <span className="text-4xl font-black text-primary">MYR {pkg.discountedPrice}</span>
                       {showSAR && <span className="text-lg font-bold text-muted-foreground">(≈ {toSAR(pkg.discountedPrice)} {language === 'ar' ? 'ر.س' : 'SAR'})</span>}
@@ -422,7 +418,6 @@ export default function Home() {
                 </h3>
                 <div className="flex items-baseline gap-2 mt-2 flex-wrap">
                   <span className="text-3xl font-black text-primary">MYR {selectedPkg.discountedPrice}</span>
-                  <span className="text-sm text-muted-foreground line-through">MYR {selectedPkg.originalPrice}</span>
                 </div>
                 {showSAR && (
                   <p className="text-xs text-muted-foreground mt-1">
