@@ -1,0 +1,24 @@
+# Gateway Services
+
+> A licensed Saudi company helping Arabic and English-speaking students register at Malaysian universities and English language centers.
+
+Gateway Services (بوابتك إلى ماليزيا) is a Saudi-registered educational consultancy that assists students — primarily from Arabic-speaking countries — with admission, visa, and settlement procedures for studying in Malaysia. All core services are provided free of charge to students.
+
+## Audience
+
+- Arabic-speaking students (primary) seeking universities or English language institutes in Malaysia
+- English-speaking international students exploring Malaysian higher education
+- Parents and guardians researching study-abroad options
+
+## Public pages
+
+- [Home](https://gatewayservicess.com/): Overview of services, featured institutions, and study packages
+- [About Us](https://gatewayservicess.com/about): Company background, mission, and why students choose Gateway Services
+- [Institutions](https://gatewayservicess.com/institutions): Directory of partnered Malaysian universities and English language centers
+- [Announcements](https://gatewayservicess.com/announcements): Latest news, promotions, and program updates
+- [Terms & Conditions](https://gatewayservicess.com/terms): Service terms, refund policy, and legal notices
+
+## Sitemap
+
+Full sitemap including individual institution detail pages:
+https://gatewayservicess.com/sitemap.xml

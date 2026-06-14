@@ -22,8 +22,27 @@ build = [ "pnpm", "--filter", "@workspace/gateway-services", "run", "build" ]
 publicDir = "artifacts/gateway-services/dist/public"
 serve = "static"
 
+# Private SPA routes (never pre-rendered) — rewrite to the SPA shell.
+# All public routes (/, /about, /institutions, /announcements, /terms, and
+# every /institutions/:id) are emitted as individual HTML files by prerender.mjs.
+# Any URL without a matching file and without a matching rewrite receives a real
+# HTTP 404, eliminating soft-404 crawl waste for invalid institution slugs and
+# unknown paths.
+
 [[services.production.rewrites]]
-from = "/*"
+from = "/dashboard"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/dashboard/*"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/admin"
+to = "/index.html"
+
+[[services.production.rewrites]]
+from = "/admin/*"
 to = "/index.html"
 
 [services.env]

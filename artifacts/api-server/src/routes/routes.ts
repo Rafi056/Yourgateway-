@@ -274,8 +274,10 @@ export async function registerRoutes(
 
       const staticPages = [
         { url: "/", priority: "1.0", changefreq: "weekly" },
+        { url: "/about", priority: "0.8", changefreq: "monthly" },
         { url: "/institutions", priority: "0.9", changefreq: "weekly" },
         { url: "/announcements", priority: "0.7", changefreq: "daily" },
+        { url: "/terms", priority: "0.5", changefreq: "monthly" },
       ];
 
       const institutionPages = institutions.map((inst) => ({
