@@ -5,7 +5,7 @@ import { useLanguage } from "@/lib/i18n";
 
 const SOCIAL_LINKS = {
   whatsapp_sa: "https://wa.me/966562022668",
-  whatsapp_my: "https://wa.me/601129082602",
+  whatsapp_my: "https://wa.me/601121728799",
   email: "mailto:hlohlo05056@gmail.com",
   instagram: "https://www.instagram.com/gmalay77?igsh=dncyN2w0b29sNXZ5",
   tiktok: "https://www.tiktok.com/@gmalay77",

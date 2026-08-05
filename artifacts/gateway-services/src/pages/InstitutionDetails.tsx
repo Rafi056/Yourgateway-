@@ -324,7 +324,7 @@ export default function InstitutionDetails() {
     const message = `طلب جديد من ${formData.studentName}\nالمؤسسة: ${institution.name}\nالبرنامج: ${formData.desiredProgram}\nالبريد: ${formData.studentEmail}`;
     const encodedMessage = encodeURIComponent(message);
     
-    window.open(`https://wa.me/601129082602?text=${encodedMessage}`, '_blank');
+    window.open(`https://wa.me/601121728799?text=${encodedMessage}`, '_blank');
     
     setTimeout(() => {
       window.open(`https://wa.me/966562022668?text=${encodedMessage}`, '_blank');
