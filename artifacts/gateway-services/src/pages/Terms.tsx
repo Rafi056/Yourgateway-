@@ -97,9 +97,10 @@ export default function Terms() {
   const rtl = dir === "rtl";
 
   useEffect(() => {
-    if (window.location.hash === "#refund") {
+    const hash = window.location.hash.slice(1);
+    if (hash) {
       setTimeout(() => {
-        const el = document.getElementById("refund");
+        const el = document.getElementById(hash);
         if (el) el.scrollIntoView({ behavior: "smooth" });
       }, 100);
     }
@@ -316,10 +317,11 @@ export default function Terms() {
 
         {/* Privacy Policy */}
         <motion.section
+          id="privacy"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden"
+          className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden scroll-mt-24"
         >
           <div className="bg-primary/5 border-b border-border px-8 py-5 flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
