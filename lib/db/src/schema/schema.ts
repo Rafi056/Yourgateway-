@@ -22,7 +22,7 @@ export const packages = pgTable("packages", {
   descriptionEn: text("description_en").notNull(),
   featuresAr: text("features_ar").array().notNull(),
   featuresEn: text("features_en").array().notNull(),
-  isSpecial: text("is_special").default("false"), // Use text for boolean simplicity in some environments or just boolean
+  isSpecial: text("is_special").default("false"),
 });
 
 export const applications = pgTable("applications", {
@@ -31,17 +31,17 @@ export const applications = pgTable("applications", {
   studentEmail: text("student_email").notNull(),
   institutionId: serial("institution_id").references(() => institutions.id),
   desiredProgram: text("desired_program").notNull(),
-  documents: text("documents"), // A simple text field to list documents or URLs
+  documents: text("documents"),
   status: varchar("status", { length: 50 }).notNull().default('pending'),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const insertInstitutionSchema = createInsertSchema(institutions).omit({ id: true });
+export const insertInstitutionSchema = createInsertSchema(institutions).omit({ id: true }).omit({});
 export const insertApplicationSchema = createInsertSchema(applications).omit({ 
   id: true, 
   status: true, 
   createdAt: true 
-});
+}).omit({});
 
 export type Institution = typeof institutions.$inferSelect;
 export type InsertInstitution = z.infer<typeof insertInstitutionSchema>;
@@ -73,8 +73,8 @@ export const announcements = pgTable("announcements", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const insertAdminUserSchema = createInsertSchema(adminUsers).omit({ id: true });
-export const insertAnnouncementSchema = createInsertSchema(announcements).omit({ id: true, createdAt: true });
+export const insertAdminUserSchema = createInsertSchema(adminUsers).omit({ id: true }).omit({});
+export const insertAnnouncementSchema = createInsertSchema(announcements).omit({ id: true, createdAt: true }).omit({});
 
 export type AdminUser = typeof adminUsers.$inferSelect;
 export type InsertAdminUser = z.infer<typeof insertAdminUserSchema>;
