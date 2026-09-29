@@ -82,7 +82,7 @@
     "@uppy/react": "^5.2.0",
     "drizzle-orm": "catalog:",
     "drizzle-zod": "0.5.1"
-  }
+  },
   "pnpm": {
     "overrides": {
       "zod": "3.22.4"
