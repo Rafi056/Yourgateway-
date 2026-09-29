@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-const logoImg from "@assets/IMG_3512_1772166816327.jpeg";
+const logoImg from "/IMG_3512_1772166816327.jpeg";
 
 export function Navbar() {
   const [location] = useLocation();
