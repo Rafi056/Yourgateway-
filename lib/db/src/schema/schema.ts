@@ -1,6 +1,6 @@
 import { pgTable, text, serial, varchar, timestamp, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export const institutions = pgTable("institutions", {
   id: serial("id").primaryKey(),
