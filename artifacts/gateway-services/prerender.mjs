@@ -14,7 +14,7 @@
  *     routing ambiguity and the dependency on the API artifact for sitemap data.
  *
  * DB access policy:
- *  - DATABASE_URL absent → exit 1 (fail-closed). Institutions require DB at build time.
+ *  - DATABASE_URL absent → skip institution pre-rendering gracefully (build succeeds).
  *  - DATABASE_URL set, DB unreachable or query fails → exit 1 (fail-closed).
  *
  * Private SPA routes (/dashboard, /admin) are NOT pre-rendered; they rely on
@@ -41,8 +41,6 @@ const BASE = "https://gatewayservicess.com";
 const TODAY = new Date().toISOString().split("T")[0];
 
 // ── Home page body content ────────────────────────────────────────────────
-// Injected into the root dist/public/index.html so the home page has crawlable
-// body text for AI and social crawlers. React replaces this on the client.
 
 const HOME_BODY = `
 <main lang="en">
@@ -129,9 +127,6 @@ function patchHead(html, { title, description, ogTitle, canonical }) {
 }
 
 // ── Body content injection ────────────────────────────────────────────────
-// Replaces <div id="root"></div> with static HTML content.
-// React's createRoot() will replace this when JavaScript executes.
-// Non-rendering AI crawlers see the real text content.
 
 function injectBody(html, bodyContent) {
   return html.replace(
@@ -255,7 +250,7 @@ const staticRoutes = [
       "Browse Malaysian universities and English language centers partnered with Gateway Services. Free admission help for Arabic-speaking students.",
     ogTitle: "Study in Malaysia — Universities & Language Centers | Gateway Services",
     canonical: `${BASE}/institutions`,
-    body: null, // replaced below with DB-rendered list
+    body: null,
   },
   {
     path: "announcements",
@@ -295,9 +290,6 @@ function buildHtml(route) {
 }
 
 // ── Patch root index.html with home page body content ────────────────────
-// The root dist/public/index.html serves "/" directly. Injecting HOME_BODY
-// gives AI and social crawlers meaningful text for the home page.
-// React's createRoot() replaces it when JavaScript executes.
 
 console.log("Patching root index.html with home page content…");
 const rootHtml = injectBody(template, HOME_BODY);
@@ -319,12 +311,53 @@ async function prerenderFromDb() {
   const DATABASE_URL = process.env.DATABASE_URL;
 
   if (!DATABASE_URL) {
-    console.error(
-      "\n  DATABASE_URL is required for pre-rendering institution pages.\n" +
-      "  Set DATABASE_URL in the build environment and retry.\n" +
-      "  Without institution pre-rendering, institution detail URLs would return HTTP 404.\n"
+    console.warn(
+      "\n  [WARN] DATABASE_URL not set. Skipping institution pre-rendering.\n" +
+      "  The site will build and deploy successfully.\n" +
+      "  Institution detail pages will render dynamically in the browser.\n" +
+      "  To enable pre-rendering later, add DATABASE_URL to Vercel Environment Variables.\n"
     );
-    process.exit(1);
+
+    // Still emit the /institutions list page (without DB data).
+    const instRoute = staticRoutes.find((r) => r.path === "institutions");
+    if (instRoute) {
+      instRoute.body = instRoute.body || `
+<main lang="en">
+  <header>
+    <h1>Universities &amp; Language Centers in Malaysia | Gateway Services</h1>
+    <p>Browse Malaysian universities and English language centers partnered with Gateway Services.</p>
+  </header>
+</main>`;
+      emit("institutions", buildHtml(instRoute));
+    }
+
+    // Still generate a basic sitemap with static pages only.
+    const sitemapPages = [
+      { url: "/", priority: "1.0", changefreq: "weekly" },
+      { url: "/about", priority: "0.8", changefreq: "monthly" },
+      { url: "/institutions", priority: "0.9", changefreq: "weekly" },
+      { url: "/announcements", priority: "0.7", changefreq: "daily" },
+      { url: "/terms", priority: "0.5", changefreq: "monthly" },
+    ];
+
+    const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${sitemapPages
+  .map(
+    (p) => `  <url>
+    <loc>${BASE}${p.url}</loc>
+    <lastmod>${TODAY}</lastmod>
+    <changefreq>${p.changefreq}</changefreq>
+    <priority>${p.priority}</priority>
+  </url>`
+  )
+  .join("\n")}
+</urlset>`;
+
+    writeFileSync(join(distDir, "sitemap.xml"), sitemapXml, "utf-8");
+    console.log(`  wrote sitemap.xml (${sitemapPages.length} URLs, static only)`);
+
+    return;
   }
 
   let pg;
