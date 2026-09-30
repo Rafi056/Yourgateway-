@@ -13,13 +13,7 @@
   "devDependencies": {
     "typescript": "~5.9.2",
     "prettier": "^3.8.1"
-  },
-  "pnpm": {
-    "overrides": {
-      "react": "19.1.0",
-      "react-dom": "19.1.0",
-      "zod": "^4.1.0",
-      "drizzle-zod": "0.8.3"
+    
     }
   }
 }
