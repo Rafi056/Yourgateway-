@@ -81,7 +81,8 @@
     "@uppy/dashboard": "^5.1.1",
     "@uppy/react": "^5.2.0",
     "drizzle-orm": "catalog:",
-    "drizzle-zod": "0.5.1"
+    "drizzle-zod": "0.5.1",
+    "pg": "^8.13.1"
   },
   "pnpm": {
     "overrides": {
