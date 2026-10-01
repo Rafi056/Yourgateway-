@@ -3,16 +3,10 @@
   "outputDirectory": "artifacts/gateway-services/dist/public",
   "installCommand": "corepack enable && corepack pnpm install",
   "framework": null,
-  "functions": {
-    "index.ts": {
-      "memory": 1024,
-      "maxDuration": 30
-    }
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/index.ts"
+      "destination": "/api/index"
     },
     {
       "source": "/((?!api/).*)",
