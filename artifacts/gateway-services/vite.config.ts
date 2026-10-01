@@ -37,4 +37,9 @@ export default defineConfig({
     port,
     host: "0.0.0.0",
   },
+  build: {
+  outDir: "dist/public",
+  emptyOutDir: true,
+  sourcemap: false,  // ← هذا يعطل Source Maps
+},
 });
