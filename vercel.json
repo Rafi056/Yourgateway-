@@ -1,8 +1,23 @@
 {
+  "buildCommand": "cd artifacts/gateway-services && corepack pnpm build",
+  "outputDirectory": "artifacts/gateway-services/dist/public",
+  "installCommand": "corepack enable && corepack pnpm install",
+  "framework": null,
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/api/(.*)",
+      "destination": "/api"
+    },
+    {
+      "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
-  ]
+  ],
+  "functions": {
+    "api/index.ts": {
+      "runtime": "nodejs20.x",
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  }
 }
